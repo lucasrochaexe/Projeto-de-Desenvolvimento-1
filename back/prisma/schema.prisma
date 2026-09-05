@@ -1,0 +1,123 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Usuario {
+  id           String        @id @default(cuid())
+  nome         String
+  email        String        @unique
+  senha        String
+  plano        Plano         @default(GRATUITO)
+  contato      String?
+  cpf          String?       @unique
+  pagamento    Pagamento?
+  statusConta  StatusConta   @default(PENDENTE)
+  nivelAcesso  NivelAcesso   @default(USUARIO)
+  
+  notificacoes Notificacao[]
+  tarefas      Tarefa[]
+  tokens       Token[]
+  logs         Log[]
+
+  @@map("usuarios")
+}
+
+model Tarefa {
+  id           String        @id @default(cuid())
+  usuarioId    String
+  titulo       String
+  descricao    String?       
+  prazoInic    DateTime?
+  prazoFim     DateTime?
+  prioridade   Prioridade    @default(MEDIA)
+  dicas        String?       
+  
+  usuario      Usuario       @relation(fields: [usuarioId], references: [id], onDelete: Cascade) 
+  notificacoes Notificacao[]
+  logs         Log[]
+
+  @@map("tarefas")
+}
+
+model Notificacao {
+  id         String   @id @default(cuid())
+  usuarioId  String
+  tarefaId   String
+  data       DateTime @default(now())
+  vencimento DateTime
+  
+  usuario    Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  tarefa     Tarefa   @relation(fields: [tarefaId], references: [id], onDelete: Cascade)
+  logs       Log[]
+
+  @@map("notificacoes")
+}
+
+model Token {
+  id         String    @id @default(cuid())
+  usuarioId  String
+  token      String    @unique
+  tipoToken  TipoToken
+  criado     DateTime  @default(now())
+  expira     DateTime
+  revogado   Boolean   @default(false)
+  
+  usuario    Usuario   @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@map("tokens")
+}
+
+model Log {
+  id            String       @id @default(cuid())
+  criadoEm      DateTime     @default(now())
+  tarefaId      String?      @map("tarefa_id")      
+  notificacaoId String?      @map("notificacao_id")
+  usuarioId     String?      @map("usuario_id")
+  
+  tarefa        Tarefa?      @relation(fields: [tarefaId], references: [id], onDelete: Cascade)
+  notificacao   Notificacao? @relation(fields: [notificacaoId], references: [id], onDelete: Cascade)
+  usuario       Usuario?     @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@map("logs")
+}
+
+enum Plano {
+  GRATUITO
+  MENSAL
+  ANUAL
+}
+
+enum NivelAcesso {
+  ADMIN
+  USUARIO
+}
+
+enum Pagamento {
+  PIX
+  CARTAO_DEBITO
+  CARTAO_CREDITO
+  GOOGLE_PLAY
+}
+
+enum StatusConta {
+  ATIVA
+  PENDENTE
+  BANIDA
+}
+
+enum Prioridade {
+  ALTA
+  MEDIA
+  BAIXA
+}
+
+enum TipoToken {
+  ATUALIZAR
+  REDEFINIR_SENHA
+  VALIDACAO_EMAIL
+}
