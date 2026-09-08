@@ -1,0 +1,25 @@
+{
+  "expo": {
+    "name": "Dexter",
+    "slug": "Dexter",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/LogoEscurofundo 2.png",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#000000",
+        "foregroundImage": "./assets/logoEscuro.png",
+        "backgroundImage": "./assets/fundo.png",
+        "monochromeImage": "./assets/logoBranco.png"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    }
+  }
+}
