@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Animated, Image, Text, View } from 'react-native';
 import { styles } from './src/style';
 import { LoginScreen } from './src/screens/LoginScreen';
+import { Cadastrar } from './src/screens/Cadastrar';
 import { MenuScreen } from './src/screens/MenuScreen';
 
 const backgroundImage = require('./assets/2.png');
@@ -12,6 +13,7 @@ export default function App() {
   const logoScale = useRef(new Animated.Value(1.25)).current;
   const [showSplash, setShowSplash] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [showRegister, setShowRegister] = useState(false);
 
   useEffect(() => {
     Animated.timing(logoScale, {
@@ -26,7 +28,18 @@ export default function App() {
 
   if (!showSplash) {
     if (!isLoggedIn) {
-      return <LoginScreen onLogin={() => setIsLoggedIn(true)} />;
+      if (showRegister) {
+        return <Cadastrar 
+        onCadastrar={() => setShowRegister(false)}
+        onCancelar={() => setShowRegister(false)} />;
+      }
+
+      return (
+        <LoginScreen
+          onLogin={() => setIsLoggedIn(true)}
+          onRegister={() => setShowRegister(true)}
+        />
+      );
     }
 
     return <MenuScreen onLogout={() => setIsLoggedIn(false)} />;

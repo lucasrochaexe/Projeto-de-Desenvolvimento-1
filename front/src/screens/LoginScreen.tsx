@@ -5,9 +5,10 @@ import { loginStyles } from './loginStyles';
 
 type LoginScreenProps = {
   onLogin: () => void;
+  onRegister: () => void;
 };
 
-export function LoginScreen({ onLogin }: LoginScreenProps) {
+export function LoginScreen({ onLogin, onRegister }: LoginScreenProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -21,7 +22,7 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
   };
 
   const handleRegister = () => {
-    Alert.alert('Cadastro', 'A area de cadastro sera disponibilizada em breve.');
+    onRegister();
   };
 
   return (
