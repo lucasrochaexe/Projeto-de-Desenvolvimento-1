@@ -13,12 +13,9 @@ model Usuario {
   email        String        @unique
   senha        String
   plano        Plano         @default(GRATUITO)
-  contato      String?
-  cpf          String?       @unique
   pagamento    Pagamento?
   statusConta  StatusConta   @default(PENDENTE)
   nivelAcesso  NivelAcesso   @default(USUARIO)
-  
   notificacoes Notificacao[]
   tarefas      Tarefa[]
   tokens       Token[]
@@ -36,7 +33,6 @@ model Tarefa {
   prazoFim     DateTime?
   prioridade   Prioridade    @default(MEDIA)
   dicas        String?       
-  
   usuario      Usuario       @relation(fields: [usuarioId], references: [id], onDelete: Cascade) 
   notificacoes Notificacao[]
   logs         Log[]
@@ -50,7 +46,6 @@ model Notificacao {
   tarefaId   String
   data       DateTime @default(now())
   vencimento DateTime
-  
   usuario    Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
   tarefa     Tarefa   @relation(fields: [tarefaId], references: [id], onDelete: Cascade)
   logs       Log[]
@@ -66,7 +61,6 @@ model Token {
   criado     DateTime  @default(now())
   expira     DateTime
   revogado   Boolean   @default(false)
-  
   usuario    Usuario   @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
 
   @@map("tokens")
@@ -78,7 +72,6 @@ model Log {
   tarefaId      String?      @map("tarefa_id")      
   notificacaoId String?      @map("notificacao_id")
   usuarioId     String?      @map("usuario_id")
-  
   tarefa        Tarefa?      @relation(fields: [tarefaId], references: [id], onDelete: Cascade)
   notificacao   Notificacao? @relation(fields: [notificacaoId], references: [id], onDelete: Cascade)
   usuario       Usuario?     @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
