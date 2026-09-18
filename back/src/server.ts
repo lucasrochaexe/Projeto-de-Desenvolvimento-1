@@ -1,5 +1,7 @@
 import express from 'express'
 import cors from 'cors'
+import cron from 'node-cron'
+import { prisma } from '../lib/prisma'
 
 //Rotas
 import routesUsuarios from './routes/usuarios'
@@ -31,6 +33,25 @@ app.use(verificaToken)
 app.use("/tarefas", routesTarefas)
 app.use("/notificacoes", routesNotificacoes)
 app.use("/agent-chat", routesAgentChat)
+
+cron.schedule('0 0 * * *', async () => {
+  console.log("Iniciando limpeza da lixeira de tarefas...")
+  const dataLimite = new Date()
+  dataLimite.setDate(dataLimite.getDate() - 7)
+
+  try {
+    const apagadas = await prisma.tarefa.deleteMany({
+      where: {
+        deletadoEm: {
+          lte: dataLimite
+        }
+      }
+    })
+    console.log(`${apagadas.count} tarefas antigas foram removidas definitivamente.`)
+  } catch (error) {
+    console.error("Erro ao limpar a lixeira:", error)
+  }
+})
 
 app.listen(port, () => {
   console.log(`Servidor rodando na porta: ${port}`)

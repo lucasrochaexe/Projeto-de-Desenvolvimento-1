@@ -32,7 +32,9 @@ model Tarefa {
   prazoInic    DateTime?
   prazoFim     DateTime?
   prioridade   Prioridade    @default(MEDIA)
-  dicas        String?       
+  status       StatusTarefa  @default(EM_ANDAMENTO)
+  dicas        String?
+  deletadoEm   DateTime?
   usuario      Usuario       @relation(fields: [usuarioId], references: [id], onDelete: Cascade) 
   notificacoes Notificacao[]
   logs         Log[]
@@ -101,6 +103,12 @@ enum StatusConta {
   ATIVA
   PENDENTE
   BANIDA
+}
+
+enum StatusTarefa {
+  EM_ANDAMENTO
+  CONCLUIDA
+  EM_ATRASO
 }
 
 enum Prioridade {

@@ -2,12 +2,11 @@ import { Request, Response, NextFunction } from 'express'
 import jwt from 'jsonwebtoken'
 
 export interface TokenInterface extends Request {
-    usuarioId?: number
-    nivelAcesso?: string
+  usuarioId?: string
+  nivelAcesso?: string
 }
 
 export function verificaToken(req: TokenInterface, res: Response, next: NextFunction) {
-  // Pega o token do cabeçalho da requisição (padrão: "Bearer <token>")
   const authHeader = req.headers.authorization
 
   if (!authHeader) {
