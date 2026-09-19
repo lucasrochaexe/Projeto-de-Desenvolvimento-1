@@ -7,12 +7,12 @@ const router = Router()
 
 const tarefaSchema = z.object({
     titulo: z.string().min(3, { message: "O título deve ter no mínimo 3 caracteres" }),
-    descricao: z.string().optional(),
+    descricao: z.string().nullable().optional(),
     prioridade: z.enum(["ALTA", "MEDIA", "BAIXA"]).default("MEDIA"),
     status: z.enum(["EM_ANDAMENTO", "CONCLUIDA", "EM_ATRASO"]).default("EM_ANDAMENTO"),
-    prazoInic: z.iso.datetime(),
-    prazoFim: z.iso.datetime(),
-    dicas: z.string().optional()
+    prazoInic: z.iso.datetime().nullable().optional(),
+    prazoFim: z.iso.datetime().nullable().optional(),
+    dicas: z.string().nullable().optional()
 })
 
 router.use(verificaToken)
@@ -41,7 +41,7 @@ router.post("/", async (req: TokenInterface, res: Response) => {
         return
     }
 
-    const { titulo, descricao, prioridade, prazoInic, prazoFim, dicas } = valida.data
+    const { titulo, descricao, prioridade, status, prazoInic, prazoFim, dicas } = valida.data
 
     try {
         const novaTarefa = await prisma.tarefa.create({
@@ -49,6 +49,7 @@ router.post("/", async (req: TokenInterface, res: Response) => {
                 titulo,
                 descricao,
                 prioridade,
+                status,
                 prazoInic: prazoInic ? new Date(prazoInic) : null,
                 prazoFim: prazoFim ? new Date(prazoFim) : null,
                 dicas,
@@ -69,7 +70,8 @@ router.delete("/:id", async (req: TokenInterface, res: Response) => {
         const tarefa = await prisma.tarefa.updateMany({
             where: {
                 id: String(id),
-                usuarioId: req.usuarioId
+                usuarioId: req.usuarioId,
+                deletadoEm: null
             },
             data: {
                 deletadoEm: new Date()
@@ -89,12 +91,12 @@ router.delete("/:id", async (req: TokenInterface, res: Response) => {
 
 const atualizaTarefaSchema = z.object({
     titulo: z.string().min(3, { message: "Mínimo de 3 caracteres" }).optional(),
-    descricao: z.string().optional(),
+    descricao: z.string().nullable().optional(),
     prioridade: z.enum(["ALTA", "MEDIA", "BAIXA"]).optional(),
     status: z.enum(["EM_ANDAMENTO", "EM_ATRASO", "CONCLUIDA"]).optional(),
-    prazoInic: z.iso.datetime().optional(),
-    prazoFim: z.iso.datetime().optional(),
-    dicas: z.string().optional()
+    prazoInic: z.iso.datetime().nullable().optional(),
+    prazoFim: z.iso.datetime().nullable().optional(),
+    dicas: z.string().nullable().optional()
 })
 
 router.patch("/:id", async (req: TokenInterface, res: Response) => {
@@ -120,8 +122,8 @@ router.patch("/:id", async (req: TokenInterface, res: Response) => {
                 descricao,
                 prioridade,
                 status,
-                prazoInic: prazoInic ? new Date(prazoInic) : undefined,
-                prazoFim: prazoFim ? new Date(prazoFim) : undefined,
+                prazoInic: prazoInic === null ? null : prazoInic ? new Date(prazoInic) : undefined,
+                prazoFim: prazoFim === null ? null : prazoFim ? new Date(prazoFim) : undefined,
                 dicas
             }
         })
@@ -134,6 +136,94 @@ router.patch("/:id", async (req: TokenInterface, res: Response) => {
         res.status(200).json({ mensagem: "Tarefa Atualizada!" })
     } catch (error) {
         res.status(500).json({ erro: "Erro ao atualizar a tarefa." })
+    }
+})
+
+router.get("/lixeira", async (req: TokenInterface, res: Response) => {
+    try {
+        const tarefasLixeira = await prisma.tarefa.findMany({
+            where: {
+                usuarioId: req.usuarioId,
+                deletadoEm: { not: null }
+            },
+            orderBy: { deletadoEm: 'desc' }
+        })
+
+        res.status(200).json(tarefasLixeira)
+    } catch (error) {
+        res.status(500).json({ erro: "Erro ao buscar tarefas na lixeira." })
+    }
+})
+
+router.get("/:id", async (req: TokenInterface, res: Response) => {
+    const { id } = req.params
+
+    try {
+        const tarefa = await prisma.tarefa.findFirst({
+            where: {
+                id: String(id),
+                usuarioId: req.usuarioId,
+                deletadoEm: null
+            }
+        })
+
+        if (!tarefa) {
+            res.status(404).json({ erro: "Tarefa não encontrada." })
+            return
+        }
+
+        res.status(200).json(tarefa)
+    } catch (error) {
+        res.status(500).json({ erro: "Erro ao buscar a tarefa." })
+    }
+})
+
+router.patch("/:id/restaurar", async (req: TokenInterface, res: Response) => {
+    const { id } = req.params
+
+    try {
+        const tarefa = await prisma.tarefa.updateMany({
+            where: {
+                id: String(id),
+                usuarioId: req.usuarioId,
+                deletadoEm: { not: null }
+            },
+            data: {
+                deletadoEm: null
+            }
+        })
+
+        if (tarefa.count === 0) {
+            res.status(404).json({ erro: "Tarefa não encontrada na lixeira ou acesso negado." })
+            return
+        }
+
+        res.status(200).json({ mensagem: "Tarefa restaurada com sucesso!" })
+    } catch (error) {
+        res.status(500).json({ erro: "Erro ao restaurar a tarefa." })
+    }
+})
+
+router.delete("/:id/definitivo", async (req: TokenInterface, res: Response) => {
+    const { id } = req.params
+
+    try {
+        const tarefa = await prisma.tarefa.deleteMany({
+            where: {
+                id: String(id),
+                usuarioId: req.usuarioId,
+                deletadoEm: { not: null }
+            }
+        })
+
+        if (tarefa.count === 0) {
+            res.status(404).json({ erro: "Tarefa não encontrada na lixeira." })
+            return
+        }
+
+        res.status(200).json({ mensagem: "Tarefa excluída permanentemente." })
+    } catch (error) {
+        res.status(500).json({ erro: "Erro ao excluir a tarefa definitivamente." })
     }
 })
 
