@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "npx tsx watch src/server.ts",
+    "dev": "npx tsx watch src/app.ts",
     "postinstall": "npx prisma generate",
     "build": "npx prisma generate && tsc"
   },
