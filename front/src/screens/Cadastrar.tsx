@@ -46,7 +46,7 @@ export function Cadastrar({ onCadastrar, onCancelar }: CadastrarProps) {
                 <Image source={require('../../assets/logoBranco - Copia.png')} style={loginStyles.logo} resizeMode="contain" />
                 <Text style={loginStyles.heading}>Cadastrar</Text>
                 <Text style={loginStyles.subtitle}>Crie sua conta Dexter</Text>
-                                <TextInput
+                    <TextInput
                     onChangeText={setNome}
                     placeholder="Nome - usuário"
                     placeholderTextColor="#9A9A9A"

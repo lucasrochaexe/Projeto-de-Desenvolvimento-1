@@ -4,9 +4,11 @@ import { menuBarStyles } from './menubarStyles';
 type MenuBarProps = {
     onBack: () => void;
     title?: string;
+    onAdd?: () => void;
+    showAdd?: boolean;
 };
 
-export function MenuBar({ onBack, title = '' }: MenuBarProps) {
+export function MenuBar({ onBack, title = '', onAdd, showAdd = false }: MenuBarProps) {
     return (
         <View style={menuBarStyles.container}>
             <Pressable
@@ -23,8 +25,21 @@ export function MenuBar({ onBack, title = '' }: MenuBarProps) {
                     style={menuBarStyles.icon}
                 />
             </Pressable>
-            <Text style={menuBarStyles.title}>{title}</Text>
+            <Text style={[menuBarStyles.title, showAdd && menuBarStyles.titleWithAdd]}>{title}</Text>
             <View style={menuBarStyles.balanceSpace} />
+            {showAdd && (
+                <Pressable
+                    accessibilityLabel="Adicionar item"
+                    accessibilityRole="button"
+                    onPress={onAdd}
+                    style={({ pressed }) => [
+                        menuBarStyles.addButton,
+                        pressed && menuBarStyles.addButtonPressed,
+                    ]}
+                >
+                    <Text style={[menuBarStyles.addButtonText, {marginLeft: -40}]}>+</Text>
+                </Pressable>
+            )}
         </View>
     );
 }

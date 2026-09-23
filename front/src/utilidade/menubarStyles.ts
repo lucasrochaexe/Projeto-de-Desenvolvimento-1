@@ -41,8 +41,29 @@ export const menuBarStyles = StyleSheet.create({
         fontSize: 18,
         fontWeight: '700',
     },
+    titleWithAdd: {
+        left: 0,
+        position: 'absolute',
+        right: 0,
+        textAlign: 'center',
+    },
     balanceSpace: {
         height: 40,
         width: 40,
+    },
+    addButton: {
+        alignItems: 'center',
+        borderRadius: 20,
+        height: 40,
+        justifyContent: 'center',
+        width: 40,
+    },
+    addButtonPressed: {
+        opacity: 0.7, // exemplo: deixa mais claro quando pressionado
+    },
+    addButtonText: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: '#333', // cor do "+"
     },
 });
