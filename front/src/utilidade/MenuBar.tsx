@@ -1,4 +1,4 @@
-import { Image, Pressable, Text, View } from 'react-native';
+import { Image, Keyboard, Pressable, Text, View } from 'react-native';
 import { menuBarStyles } from './menubarStyles';
 
 type MenuBarProps = {
@@ -14,7 +14,11 @@ export function MenuBar({ onBack, title = '', onAdd, showAdd = false }: MenuBarP
             <Pressable
                 accessibilityLabel="Voltar ao menu"
                 accessibilityRole="button"
-                onPress={onBack}
+                hitSlop={8}
+                onPress={() => {
+                    Keyboard.dismiss();
+                    onBack();
+                }}
                 style={({ pressed }) => [
                     menuBarStyles.backButton,
                     pressed && menuBarStyles.backButtonPressed,
@@ -25,7 +29,12 @@ export function MenuBar({ onBack, title = '', onAdd, showAdd = false }: MenuBarP
                     style={menuBarStyles.icon}
                 />
             </Pressable>
-            <Text style={[menuBarStyles.title, showAdd && menuBarStyles.titleWithAdd]}>{title}</Text>
+            <Text
+                pointerEvents="none"
+                style={[menuBarStyles.title, showAdd && menuBarStyles.titleWithAdd]}
+            >
+                {title}
+            </Text>
             <View style={menuBarStyles.balanceSpace} />
             {showAdd && (
                 <Pressable

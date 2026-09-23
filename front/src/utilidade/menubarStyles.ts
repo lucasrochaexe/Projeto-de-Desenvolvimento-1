@@ -21,13 +21,18 @@ export const menuBarStyles = StyleSheet.create({
         marginRight: -25,
         marginTop: -40,
         paddingHorizontal: 16,
+        position: 'relative',
+        zIndex: 10,
     },
     backButton: {
         alignItems: 'center',
         borderRadius: 20,
+        elevation: 20,
         height: 40,
         justifyContent: 'center',
+        position: 'relative',
         width: 40,
+        zIndex: 20,
     },
     backButtonPressed: {
         backgroundColor: 'rgba(39, 35, 31, 0.10)',

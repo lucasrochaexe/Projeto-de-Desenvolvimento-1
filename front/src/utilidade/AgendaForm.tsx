@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 export type AgendaItem = {
     titulo: string;
@@ -18,22 +19,55 @@ export function AgendaForm({ onConfirm, onCancel }: AgendaFormProps) {
     const [titulo, setTitulo] = useState('');
     const [inicio, setInicio] = useState('');
     const [fim, setFim] = useState('');
+    const [dataSelecionada, setDataSelecionada] = useState<'inicio' | 'fim' | null>(null);
     const [obs, setObs] = useState('');
     const [prioridade, setPrioridade] = useState<AgendaItem['prioridade']>('media');
+    const [obsHeight, setObsHeight] = useState(100);
 
     const confirmar = () => {
         onConfirm({ titulo, inicio, fim, obs, prioridade });
     };
 
+    const abrirCalendario = (campo: 'inicio' | 'fim') => setDataSelecionada(campo);
+
+    const selecionarData = (_event: unknown, data?: Date) => {
+        if (data && dataSelecionada === 'inicio') {
+            setInicio(formatarData(data));
+        }
+        if (data && dataSelecionada === 'fim') {
+            setFim(formatarData(data));
+        }
+        setDataSelecionada(null);
+    };
+
+    const dataDoCalendario = dataSelecionada === 'fim' && fim
+        ? converterData(fim)
+        : dataSelecionada === 'inicio' && inicio
+            ? converterData(inicio)
+            : new Date();
+    
     return (
         <View style={styles.form}>
         <TextInput style={styles.input} placeholder="Título" value={titulo} onChangeText={setTitulo} />
         <View style={styles.dateRow}>
-            <TextInput style={[styles.input, styles.dateInput]} placeholder="Data - início" value={inicio} onChangeText={setInicio} />
-            <TextInput style={[styles.input, styles.dateInput]} placeholder="Data - final" value={fim} onChangeText={setFim} />
+            <Pressable style={[styles.input, styles.dateInput]} onPress={() => abrirCalendario('inicio')}>
+                <TextInput pointerEvents="none" style={styles.dateText} placeholder="Data - início" value={inicio} editable={false} />
+            </Pressable>
+            <Pressable style={[styles.input, styles.dateInput]} onPress={() => abrirCalendario('fim')}>
+                <TextInput pointerEvents="none" style={styles.dateText} placeholder="Data - final" value={fim} editable={false} />
+            </Pressable>
         </View>
+        {dataSelecionada && <DateTimePicker value={dataDoCalendario} mode="date" onChange={selecionarData} />}
         <Text style={styles.label}>Obs:</Text>
-        <TextInput style={[styles.input, styles.observation]} multiline value={obs} onChangeText={setObs} />
+        <TextInput
+            style={[styles.input, { height: Math.max(100, obsHeight) }]}
+            multiline
+            value={obs}
+            onChangeText={setObs}
+            onContentSizeChange={(event) => {
+                setObsHeight(event.nativeEvent.contentSize.height);
+            }}
+        />
 
         <View style={styles.prioridade}>
             <PriorityButton label="Urgente" color="#F51B25" selected={prioridade === 'urgente'} onPress={() => setPrioridade('urgente')} />
@@ -78,8 +112,8 @@ const styles = StyleSheet.create({
     input: {
         backgroundColor: '#F1F1F5',
         color: '#222222',
-        fontSize: 10,
-        height: 22,
+        fontSize: 14,
+        height: 40,
         marginBottom: 12,
         paddingHorizontal: 5,
     },
@@ -89,6 +123,13 @@ const styles = StyleSheet.create({
     },
     dateInput: {
         width: '43%',
+    },
+    dateText: {
+        color: '#222222',
+        flex: 1,
+        fontSize: 14,
+        height: 40,
+        paddingHorizontal: 0,
     },
     label: {
         color: '#222222',
@@ -147,3 +188,12 @@ const styles = StyleSheet.create({
         fontSize: 9,
     },
 });
+
+function formatarData(data: Date) {
+    return `${String(data.getDate()).padStart(2, '0')}/${String(data.getMonth() + 1).padStart(2, '0')}/${data.getFullYear()}`;
+}
+
+function converterData(data: string) {
+    const [dia, mes, ano] = data.split('/').map(Number);
+    return new Date(ano, mes - 1, dia);
+}

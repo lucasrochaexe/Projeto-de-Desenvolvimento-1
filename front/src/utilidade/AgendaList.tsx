@@ -74,6 +74,6 @@ const styles = StyleSheet.create({
     detailsButtonText: {
         color: '#FFFFFF',
         fontFamily: 'serif',
-        fontSize: 11,
+        fontSize: 10,
     },
 });
