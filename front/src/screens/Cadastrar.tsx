@@ -3,6 +3,7 @@ import { StatusBar } from "expo-status-bar";
 import { useState } from "react";
 import { Alert, Image, KeyboardAvoidingView, Platform, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { loginStyles } from "./loginStyles";
+import { cadastrarUsuario } from '../services/api';
 
 type CadastrarProps = {
     onCadastrar: () => void;
@@ -23,16 +24,40 @@ export function Cadastrar({ onCadastrar, onCancelar }: CadastrarProps) {
         ]);
     }
 
-    const handleCadastrar = () => {
+    const handleCadastrar = async () => {
         if (!email.trim() || !password.trim() || !confirmPassword.trim() || !nome.trim()) {
-            Alert.alert('Campos obrigatorios', 'Preencha todos os campos para continuar.');
+            Alert.alert(
+            'Campos obrigatorios',
+            'Preencha todos os campos para continuar.'
+            );
             return;
         }
+
         if (password !== confirmPassword) {
-            Alert.alert('Senhas não coincidem', 'As senhas digitadas não coincidem. Por favor, tente novamente.');
+            Alert.alert(
+            'Senhas não coincidem',
+            'As senhas digitadas não coincidem.'
+            );
             return;
         }
-        onCadastrar();
+
+        try {
+            const resposta = await cadastrarUsuario(
+            nome.trim(),
+            email.trim(),
+            password
+            );
+
+            Alert.alert('Cadastro realizado', resposta.mensagem);
+            onCadastrar();
+        } catch (error) {
+            const mensagem =
+            error instanceof Error
+                ? error.message
+                : 'Não foi possível realizar o cadastro';
+
+            Alert.alert('Erro no cadastro', mensagem);
+        }
     };
 
     return (

@@ -28,14 +28,14 @@ model Tarefa {
   id           String        @id @default(cuid())
   usuarioId    String
   titulo       String
-  descricao    String?       
+  descricao    String?
   prazoInic    DateTime?
   prazoFim     DateTime?
   prioridade   Prioridade    @default(MEDIA)
   status       StatusTarefa  @default(EM_ANDAMENTO)
   dicas        String?
   deletadoEm   DateTime?
-  usuario      Usuario       @relation(fields: [usuarioId], references: [id], onDelete: Cascade) 
+  usuario      Usuario       @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
   notificacoes Notificacao[]
   logs         Log[]
 
@@ -56,14 +56,14 @@ model Notificacao {
 }
 
 model Token {
-  id         String    @id @default(cuid())
-  usuarioId  String
-  token      String    @unique
-  tipoToken  TipoToken
-  criado     DateTime  @default(now())
-  expira     DateTime
-  revogado   Boolean   @default(false)
-  usuario    Usuario   @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  id        String    @id @default(cuid())
+  usuarioId String
+  token     String    @unique
+  tipoToken TipoToken
+  criado    DateTime  @default(now())
+  expira    DateTime
+  revogado  Boolean   @default(false)
+  usuario   Usuario   @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
 
   @@map("tokens")
 }
@@ -71,7 +71,7 @@ model Token {
 model Log {
   id            String       @id @default(cuid())
   criadoEm      DateTime     @default(now())
-  tarefaId      String?      @map("tarefa_id")      
+  tarefaId      String?      @map("tarefa_id")
   notificacaoId String?      @map("notificacao_id")
   usuarioId     String?      @map("usuario_id")
   tarefa        Tarefa?      @relation(fields: [tarefaId], references: [id], onDelete: Cascade)

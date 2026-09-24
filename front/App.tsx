@@ -6,10 +6,15 @@ import { LoginScreen } from './src/screens/LoginScreen';
 import { Cadastrar } from './src/screens/Cadastrar';
 import { MenuScreen } from './src/screens/MenuScreen';
 
+
+const apiUrl = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3000';
+
+
 const backgroundImage = require('./assets/2.png');
 const logoImage = require('./assets/logoBranco - Copia.png');
 
 export default function App() {
+  const [token, setToken] = useState<string | null>(null);
   const logoScale = useRef(new Animated.Value(1.25)).current;
   const [showSplash, setShowSplash] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -35,14 +40,26 @@ export default function App() {
       }
 
       return (
+
         <LoginScreen
-          onLogin={() => setIsLoggedIn(true)}
-          onRegister={() => setShowRegister(true)}
-        />
+            onLogin={(novoToken) => {
+              setToken(novoToken);
+              setIsLoggedIn(true);
+            }}
+            onRegister={() => setShowRegister(true)}
+          /> 
       );
     }
 
-    return <MenuScreen onLogout={() => setIsLoggedIn(false)} />;
+    return (
+      <MenuScreen
+        token={token}
+        onLogout={() => {
+          setToken(null);
+          setIsLoggedIn(false);
+        }}
+      />
+    );
   }
 
   return (

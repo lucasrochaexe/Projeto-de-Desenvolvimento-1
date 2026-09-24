@@ -1,13 +1,11 @@
-import { prisma } from "../../lib/prisma"
-import { Router } from 'express'
-import { z } from 'zod'
-import { verificaToken, verificaAdmin } from "./verificaToken"
-import bcrypt from 'bcrypt'
-import nodemailer from 'nodemailer'
-import crypto from 'crypto'
-
-const router = Router()
-
+import { prisma } from "../../lib/prisma";
+import { Router } from 'express';
+import { z } from 'zod';
+import { verificaToken, verificaAdmin } from "./verificaToken";
+import bcrypt from 'bcrypt';
+import nodemailer from 'nodemailer';
+import crypto from 'crypto';
+const router = Router();
 const transporter = nodemailer.createTransport({
     host: "sandbox.smtp.mailtrap.io",
     port: 587,
@@ -16,104 +14,79 @@ const transporter = nodemailer.createTransport({
         user: process.env.MAILTRAP_EMAIL,
         pass: process.env.MAILTRAP_SENHA
     },
-})
-
+});
 const usuarioSchema = z.object({
-    nome: z.string().min(3,
-        { message: "Nome deve possuir, no mínimo, 3 caracteres" }),
-    email: z.email().min(10,
-        { message: "E-mail, no mínimo, 10 caracteres" }),
-    senha: z.string().min(8,
-        { message: "Senha deve possuir, no mínimo, 8 caracteres" }),
-})
-
+    nome: z.string().min(3, { message: "Nome deve possuir, no mínimo, 3 caracteres" }),
+    email: z.email().min(10, { message: "E-mail, no mínimo, 10 caracteres" }),
+    senha: z.string().min(8, { message: "Senha deve possuir, no mínimo, 8 caracteres" }),
+});
 router.get("/", verificaToken, verificaAdmin, async (req, res) => {
     try {
-        const usuarios = await prisma.usuario.findMany()
-        res.status(200).json(usuarios)
-    } catch (error) {
-        res.status(500).json({ erro: "Erro ao buscar usuários" })
+        const usuarios = await prisma.usuario.findMany();
+        res.status(200).json(usuarios);
     }
-})
-
-function validaSenha(senha: string) {
-
-    const mensa: string[] = []
-
+    catch (error) {
+        res.status(500).json({ erro: "Erro ao buscar usuários" });
+    }
+});
+function validaSenha(senha) {
+    const mensa = [];
     if (senha.length < 8) {
-        mensa.push("Erro... senha deve possuir, no mínimo, 8 caracteres")
+        mensa.push("Erro... senha deve possuir, no mínimo, 8 caracteres");
     }
-
-
-    let pequenas = 0
-    let grandes = 0
-    let numeros = 0
-    let simbolos = 0
-
-
+    let pequenas = 0;
+    let grandes = 0;
+    let numeros = 0;
+    let simbolos = 0;
     for (const letra of senha) {
         if ((/[a-z]/).test(letra)) {
-            pequenas++
+            pequenas++;
         }
         else if ((/[A-Z]/).test(letra)) {
-            grandes++
+            grandes++;
         }
         else if ((/[0-9]/).test(letra)) {
-            numeros++
-        } else {
-            simbolos++
+            numeros++;
+        }
+        else {
+            simbolos++;
         }
     }
-
     if (pequenas == 0) {
-        mensa.push("Erro... senha deve possuir letra(s) minúscula(s)")
+        mensa.push("Erro... senha deve possuir letra(s) minúscula(s)");
     }
-
     if (grandes == 0) {
-        mensa.push("Erro... senha deve possuir letra(s) maiúscula(s)")
+        mensa.push("Erro... senha deve possuir letra(s) maiúscula(s)");
     }
-
     if (numeros == 0) {
-        mensa.push("Erro... senha deve possuir número(s)")
+        mensa.push("Erro... senha deve possuir número(s)");
     }
-
     if (simbolos == 0) {
-        mensa.push("Erro... senha deve possuir símbolo(s)")
+        mensa.push("Erro... senha deve possuir símbolo(s)");
     }
-
-    return mensa
+    return mensa;
 }
-
 router.post("/", async (req, res) => {
-
-    const valida = usuarioSchema.safeParse(req.body)
+    const valida = usuarioSchema.safeParse(req.body);
     if (!valida.success) {
-        res.status(400).json({ erro: valida.error })
-        return
+        res.status(400).json({ erro: valida.error });
+        return;
     }
-
-    const { nome, email, senha } = valida.data
-
-    const mensaErros = validaSenha(senha)
-
+    const { nome, email, senha } = valida.data;
+    const mensaErros = validaSenha(senha);
     if (mensaErros.length > 0) {
-        res.status(400).json({ erro: mensaErros })
-        return
+        res.status(400).json({ erro: mensaErros });
+        return;
     }
-
-    const salt = bcrypt.genSaltSync(12)
-
-    const hash = bcrypt.hashSync(senha, salt)
-
+    const salt = bcrypt.genSaltSync(12);
+    const hash = bcrypt.hashSync(senha, salt);
     try {
         const usuario = await prisma.usuario.create({
             data: { nome, email, senha: hash }
-        })
-
-        const tokenAtivacao = crypto.randomBytes(32).toString('hex')
-        const validadeToken = new Date()
-        validadeToken.setHours(validadeToken.getHours() + 24)
-
+        });
+        const tokenAtivacao = crypto.randomBytes(32).toString('hex');
+        const validadeToken = new Date();
+        validadeToken.setHours(validadeToken.getHours() + 24);
         await prisma.token.create({
             data: {
                 usuarioId: usuario.id,
@@ -121,17 +94,15 @@ router.post("/", async (req, res) => {
                 tipoToken: "VALIDACAO_EMAIL",
                 expira: validadeToken
             }
-        })
-
-        const apiPublica = process.env.API_PUBLIC_URL || "http://localhost:3000"
-        const linkAtivacao = `${apiPublica}/usuarios/ativar?token=${tokenAtivacao}`
-
+        });
+        const apiPublica = process.env.API_PUBLIC_URL || "http://localhost:3000";
+        const linkAtivacao = `${apiPublica}/usuarios/ativar?token=${tokenAtivacao}`;
         transporter.sendMail({
             from: '"Dexter App" <support@dexterapp.com>',
             to: email,
-                        subject: "Bem-vindo ao Dexter | Simplificando sua rotina",
-                        text: `Bem-vindo ao Dexter!\n\nSimplificando sua rotina, um dia de cada vez.\n\nAtive sua conta pelo link:\n${linkAtivacao}\n\nEste link expira em 24 horas.`,
-                        html: `
+            subject: "Bem-vindo ao Dexter | Simplificando sua rotina",
+            text: `Bem-vindo ao Dexter!\n\nSimplificando sua rotina, um dia de cada vez.\n\nAtive sua conta pelo link:\n${linkAtivacao}\n\nEste link expira em 24 horas.`,
+            html: `
                         <!DOCTYPE html>
                         <html lang="pt-BR">
                             <body style="margin:0; padding:0; background-color:#f4f1eb; font-family:Arial, Helvetica, sans-serif; color:#242424;">
@@ -171,16 +142,14 @@ router.post("/", async (req, res) => {
                                 </table>
                             </body>
                         </html>`
-        }).catch(err => console.error("Erro ao enviar email de ativação:", err))
-
-        res.status(201).json({ mensagem: "Verifique seu e-mail para ativar sua conta." })
+        }).catch(err => console.error("Erro ao enviar email de ativação:", err));
+        res.status(201).json({ mensagem: "Verifique seu e-mail para ativar sua conta." });
     }
     catch (error) {
-        res.status(400).json({ erro: "Erro ao criar usuário" })
+        res.status(400).json({ erro: "Erro ao criar usuário" });
     }
-})
-
-async function ativarConta(token: string) {
+});
+async function ativarConta(token) {
     const tokenValido = await prisma.token.findFirst({
         where: {
             token,
@@ -188,28 +157,23 @@ async function ativarConta(token: string) {
             revogado: false,
             expira: { gt: new Date() },
         }
-    })
-
+    });
     if (!tokenValido) {
-        throw new Error("Link de ativação inválido ou expirado")
+        throw new Error("Link de ativação inválido ou expirado");
     }
-
     await prisma.usuario.update({
         where: { id: tokenValido.usuarioId },
         data: { statusConta: "ATIVA" }
-    })
-
+    });
     await prisma.token.update({
         where: { id: tokenValido.id },
         data: { revogado: true }
-    })
+    });
 }
-
-function paginaAtivacao(titulo: string, mensagem: string, sucesso: boolean) {
-        const cor = sucesso ? "#d5a23a" : "#c75c5c"
-        const simbolo = sucesso ? "✓" : "!"
-
-        return `<!DOCTYPE html>
+function paginaAtivacao(titulo, mensagem, sucesso) {
+    const cor = sucesso ? "#d5a23a" : "#c75c5c";
+    const simbolo = sucesso ? "✓" : "!";
+    return `<!DOCTYPE html>
 <html lang="pt-BR">
     <head>
         <meta charset="UTF-8" />
@@ -283,76 +247,65 @@ function paginaAtivacao(titulo: string, mensagem: string, sucesso: boolean) {
             <footer class="footer">Dexter | Organização para o seu dia</footer>
         </main>
     </body>
-</html>`
+</html>`;
 }
-
 router.get("/ativar", async (req, res) => {
-    const token = String(req.query.token || "")
-
+    const token = String(req.query.token || "");
     if (!token) {
-        res.status(400).send(paginaAtivacao("Não foi possível ativar", "O token de ativação não foi fornecido.", false))
-        return
+        res.status(400).send(paginaAtivacao("Não foi possível ativar", "O token de ativação não foi fornecido.", false));
+        return;
     }
-
     try {
-        await ativarConta(token)
-        res.status(200).send(paginaAtivacao("Conta ativada!", "Sua conta Dexter está pronta. Volte ao aplicativo e faça login para começar.", true))
-    } catch (error) {
-        const mensagem = error instanceof Error ? error.message : "Erro ao ativar a conta."
-        res.status(400).send(paginaAtivacao("Link indisponível", mensagem, false))
+        await ativarConta(token);
+        res.status(200).send(paginaAtivacao("Conta ativada!", "Sua conta Dexter está pronta. Volte ao aplicativo e faça login para começar.", true));
     }
-})
-
+    catch (error) {
+        const mensagem = error instanceof Error ? error.message : "Erro ao ativar a conta.";
+        res.status(400).send(paginaAtivacao("Link indisponível", mensagem, false));
+    }
+});
 router.post("/ativar", async (req, res) => {
-    const { token } = req.body
-
+    const { token } = req.body;
     if (!token) {
-        res.status(400).json({ erro: "Token de ativação não fornecido." })
-        return
+        res.status(400).json({ erro: "Token de ativação não fornecido." });
+        return;
     }
-
     try {
-        await ativarConta(token)
-        res.status(200).json({ mensagem: "Conta ativada com sucesso! Você já pode fazer login." })
-    } catch (error) {
-        const mensagem = error instanceof Error ? error.message : "Erro ao ativar a conta."
-        res.status(400).json({ erro: mensagem })
+        await ativarConta(token);
+        res.status(200).json({ mensagem: "Conta ativada com sucesso! Você já pode fazer login." });
     }
-})
-
+    catch (error) {
+        const mensagem = error instanceof Error ? error.message : "Erro ao ativar a conta.";
+        res.status(400).json({ erro: mensagem });
+    }
+});
 router.delete("/:id", verificaToken, verificaAdmin, async (req, res) => {
-    const { id } = req.params
-
+    const { id } = req.params;
     try {
         const usuario = await prisma.usuario.delete({
             where: { id: String(id) }
-        })
-        res.status(200).json(usuario)
-    } catch (error) {
-        res.status(400).json({ erro: "Erro no servidor" })
+        });
+        res.status(200).json(usuario);
     }
-})
-
+    catch (error) {
+        res.status(400).json({ erro: "Erro no servidor" });
+    }
+});
 router.post("/esqueceu-senha", async (req, res) => {
-    const { email } = req.body
-
+    const { email } = req.body;
     try {
-        const usuario = await prisma.usuario.findUnique({ where: { email } })
-
+        const usuario = await prisma.usuario.findUnique({ where: { email } });
         if (!usuario) {
-            res.status(400).json({ erro: "E-mail não encontrado na base de dados" })
-            return
+            res.status(400).json({ erro: "E-mail não encontrado na base de dados" });
+            return;
         }
-
-        const caracteres = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-        let codigo = ""
+        const caracteres = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        let codigo = "";
         for (let i = 0; i < 4; i++) {
-            codigo += caracteres.charAt(Math.floor(Math.random() * caracteres.length))
+            codigo += caracteres.charAt(Math.floor(Math.random() * caracteres.length));
         }
-
-        const validadeToken = new Date()
-        validadeToken.setMinutes(validadeToken.getMinutes() + 15)
-
+        const validadeToken = new Date();
+        validadeToken.setMinutes(validadeToken.getMinutes() + 15);
         await prisma.token.create({
             data: {
                 usuarioId: usuario.id,
@@ -360,38 +313,32 @@ router.post("/esqueceu-senha", async (req, res) => {
                 tipoToken: "REDEFINIR_SENHA",
                 expira: validadeToken
             }
-        })
-
+        });
         transporter.sendMail({
             from: '"Dexter App" <support@dexterapp.com>',
             to: email,
             subject: "Código de Recuperação de Senha",
             text: `Seu código de recuperação é: ${codigo}`,
             html: `<h3>Recuperação de Senha</h3><p>Seu código de recuperação é: <b>${codigo}</b></p>`
-        }).catch(err => console.error("Erro ao enviar email:", err))
-
-        res.status(200).json({ mensagem: "Um código de recuperação foi enviado para o seu e-mail" })
-
-    } catch (error) {
-        console.error("Erro na validação do esqueceu senha:", error)
-        res.status(500).json({ erro: "Erro no servidor" })
+        }).catch(err => console.error("Erro ao enviar email:", err));
+        res.status(200).json({ mensagem: "Um código de recuperação foi enviado para o seu e-mail" });
     }
-})
-
+    catch (error) {
+        console.error("Erro na validação do esqueceu senha:", error);
+        res.status(500).json({ erro: "Erro no servidor" });
+    }
+});
 router.post("/recupera-senha", async (req, res) => {
-    const { email, codigo, novaSenha } = req.body
-
+    const { email, codigo, novaSenha } = req.body;
     if (!email || !codigo || !novaSenha) {
-        res.status(400).json({ erro: "Por favor, informe o e-mail, o código e a nova senha" })
-        return
+        res.status(400).json({ erro: "Por favor, informe o e-mail, o código e a nova senha" });
+        return;
     }
-
-    const mensaErros = validaSenha(novaSenha)
+    const mensaErros = validaSenha(novaSenha);
     if (mensaErros.length > 0) {
-        res.status(400).json({ erro: mensaErros })
-        return
+        res.status(400).json({ erro: mensaErros });
+        return;
     }
-
     try {
         const tokenValido = await prisma.token.findFirst({
             where: {
@@ -401,54 +348,43 @@ router.post("/recupera-senha", async (req, res) => {
                 expira: { gt: new Date() },
                 usuario: { email: email }
             }
-        })
-
+        });
         if (!tokenValido) {
-            res.status(400).json({ erro: "Código de recuperação inválido ou expirado" })
-            return
+            res.status(400).json({ erro: "Código de recuperação inválido ou expirado" });
+            return;
         }
-
-        const salt = bcrypt.genSaltSync(12)
-        const hash = bcrypt.hashSync(novaSenha, salt)
-
+        const salt = bcrypt.genSaltSync(12);
+        const hash = bcrypt.hashSync(novaSenha, salt);
         await prisma.usuario.update({
             where: { email },
             data: { senha: hash }
-        })
-
+        });
         await prisma.token.update({
             where: { id: tokenValido.id },
             data: { revogado: true }
-        })
-
-        res.status(200).json({ mensagem: "Senha alterada com sucesso! Você já pode fazer login." })
-
-    } catch (error) {
-        res.status(500).json({ erro: "Erro ao redefinir senha" })
+        });
+        res.status(200).json({ mensagem: "Senha alterada com sucesso! Você já pode fazer login." });
     }
-})
-
+    catch (error) {
+        res.status(500).json({ erro: "Erro ao redefinir senha" });
+    }
+});
 router.post("/reenviar-ativacao", async (req, res) => {
-    const { email } = req.body
-
+    const { email } = req.body;
     if (!email) {
-        res.status(400).json({ erro: "E-mail é obrigatório." })
-        return
+        res.status(400).json({ erro: "E-mail é obrigatório." });
+        return;
     }
-
     try {
-        const usuario = await prisma.usuario.findUnique({ where: { email } })
-
+        const usuario = await prisma.usuario.findUnique({ where: { email } });
         if (!usuario) {
-            res.status(400).json({ erro: "E-mail não encontrado." })
-            return
+            res.status(400).json({ erro: "E-mail não encontrado." });
+            return;
         }
-
         if (usuario.statusConta === "ATIVA") {
-            res.status(400).json({ erro: "Esta conta já está ativada." })
-            return
+            res.status(400).json({ erro: "Esta conta já está ativada." });
+            return;
         }
-
         await prisma.token.updateMany({
             where: {
                 usuarioId: usuario.id,
@@ -456,12 +392,10 @@ router.post("/reenviar-ativacao", async (req, res) => {
                 revogado: false
             },
             data: { revogado: true }
-        })
-
-        const tokenAtivacao = crypto.randomBytes(32).toString('hex')
-        const validadeToken = new Date()
-        validadeToken.setHours(validadeToken.getHours() + 24)
-
+        });
+        const tokenAtivacao = crypto.randomBytes(32).toString('hex');
+        const validadeToken = new Date();
+        validadeToken.setHours(validadeToken.getHours() + 24);
         await prisma.token.create({
             data: {
                 usuarioId: usuario.id,
@@ -469,11 +403,9 @@ router.post("/reenviar-ativacao", async (req, res) => {
                 tipoToken: "VALIDACAO_EMAIL",
                 expira: validadeToken
             }
-        })
-
-        const apiPublica = process.env.API_PUBLIC_URL || "http://localhost:3000"
-        const linkAtivacao = `${apiPublica}/usuarios/ativar?token=${tokenAtivacao}`
-
+        });
+        const apiPublica = process.env.API_PUBLIC_URL || "http://localhost:3000";
+        const linkAtivacao = `${apiPublica}/usuarios/ativar?token=${tokenAtivacao}`;
         transporter.sendMail({
             from: '"Dexter App" <support@dexterapp.com>',
             to: email,
@@ -483,14 +415,12 @@ router.post("/reenviar-ativacao", async (req, res) => {
             <p>Para começar a usar o aplicativo, ative sua conta clicando no link abaixo:</p>
             <a href="${linkAtivacao}">Ativar Minha Conta</a>
             <p>Este link expira em 24 horas.</p>`
-        }).catch(err => console.error("Erro ao reenviar email:", err))
-
-        res.status(200).json({ mensagem: "Um novo link de ativação foi enviado para seu e-mail." })
-
-    } catch (error) {
-        console.error("ERRO NO REENVIO:", error)
-        res.status(500).json({ erro: "Erro ao reenviar o e-mail de ativação." })
+        }).catch(err => console.error("Erro ao reenviar email:", err));
+        res.status(200).json({ mensagem: "Um novo link de ativação foi enviado para seu e-mail." });
     }
-})
-
-export default router
+    catch (error) {
+        console.error("ERRO NO REENVIO:", error);
+        res.status(500).json({ erro: "Erro ao reenviar o e-mail de ativação." });
+    }
+});
+export default router;

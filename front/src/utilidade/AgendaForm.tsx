@@ -146,7 +146,7 @@ const styles = StyleSheet.create({
     priorityOption: {
         alignItems: 'center',
         flexDirection: 'row',
-        height: 15,
+        height: 25,
     },
     swatch: {
         height: 8,
@@ -159,7 +159,7 @@ const styles = StyleSheet.create({
     },
     priorityText: {
         color: '#222222',
-        fontSize: 9,
+        fontSize: 15,
     },
     actions: {
         flexDirection: 'row',
