@@ -72,3 +72,57 @@ export async function criarTarefa(
         body: JSON.stringify(tarefa),
     });
 }
+
+export async function buscarTarefasArquivadas(token: string) {
+    return apiRequest('/tarefas/arquivo', {
+        method: 'GET',
+        token,
+    });
+}
+
+export async function buscarTarefasExcluidas(token: string) {
+    return apiRequest('/tarefas/lixeira', {
+        method: 'GET',
+        token,
+    });
+}
+
+export async function arquivarTarefa(token: string, id: string) {
+    return apiRequest(`/tarefas/${id}/arquivar`, {
+        method: 'PATCH',
+        token,
+    });
+}
+
+export async function excluirTarefa(token: string, id: string) {
+    return apiRequest(`/tarefas/${id}`, {
+        method: 'DELETE',
+        token,
+    });
+}
+
+export async function restaurarTarefa(token: string, id: string) {
+    return apiRequest(`/tarefas/${id}/restaurar`, {
+        method: 'PATCH',
+        token,
+    });
+}
+
+export async function atualizarTarefa(
+    token: string,
+    id: string,
+    tarefa: {
+        titulo?: string;
+        descricao?: string | null;
+        prioridade?: 'ALTA' | 'MEDIA' | 'BAIXA';
+        prazoInic?: string | null;
+        prazoFim?: string | null;
+        status?: 'EM_ANDAMENTO' | 'CONCLUIDA' | 'EM_ATRASO';
+    }
+) {
+    return apiRequest(`/tarefas/${id}`, {
+        method: 'PATCH',
+        token,
+        body: JSON.stringify(tarefa),
+    });
+}

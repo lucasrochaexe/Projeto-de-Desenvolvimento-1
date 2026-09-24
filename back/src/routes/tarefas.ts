@@ -22,7 +22,8 @@ router.get("/", async (req: TokenInterface, res: Response) => {
         const tarefas = await prisma.tarefa.findMany({
             where: {
                 usuarioId: req.usuarioId,
-                deletadoEm: null
+                deletadoEm: null,
+                arquivadoEm: null
             },
             orderBy: { prazoFim: 'asc' }
         })
@@ -155,6 +156,27 @@ router.get("/lixeira", async (req: TokenInterface, res: Response) => {
     }
 })
 
+router.get("/arquivo", async (req: TokenInterface, res: Response) => {
+    try {
+        const tarefasArquivadas = await prisma.tarefa.findMany({
+            where: {
+                usuarioId: req.usuarioId,
+                deletadoEm: null,
+                arquivadoEm: { not: null },
+            },
+            orderBy: {
+                arquivadoEm: 'desc',
+            },
+        });
+
+        res.status(200).json(tarefasArquivadas);
+    } catch {
+        res.status(500).json({
+            erro: 'Erro ao buscar tarefas arquivadas.',
+        });
+    }
+});
+
 router.get("/:id", async (req: TokenInterface, res: Response) => {
     const { id } = req.params
 
@@ -226,5 +248,98 @@ router.delete("/:id/definitivo", async (req: TokenInterface, res: Response) => {
         res.status(500).json({ erro: "Erro ao excluir a tarefa definitivamente." })
     }
 })
+
+
+
+router.patch("/:id/arquivar", async (req: TokenInterface, res: Response) => {
+    const tarefa = await prisma.tarefa.updateMany({
+        where: {
+            id: String(req.params.id),
+            usuarioId: req.usuarioId,
+            deletadoEm: null,
+            arquivadoEm: null,
+        },
+        data: {
+            arquivadoEm: new Date(),
+        },
+    });
+
+    if (tarefa.count === 0) {
+        res.status(404).json({
+            erro: 'Tarefa não encontrada ou já arquivada.',
+        });
+        return;
+    }
+
+    res.status(200).json({
+        mensagem: 'Tarefa arquivada com sucesso.',
+    });
+});
+
+router.delete("/:id", async (req: TokenInterface, res: Response) => {
+    const tarefa = await prisma.tarefa.updateMany({
+        where: {
+            id: String(req.params.id),
+            usuarioId: req.usuarioId,
+            deletadoEm: null,
+        },
+        data: {
+            deletadoEm: new Date(),
+        },
+    });
+
+    if (tarefa.count === 0) {
+        res.status(404).json({
+            erro: 'Tarefa não encontrada.',
+        });
+        return;
+    }
+
+    res.status(200).json({
+        mensagem: 'Tarefa movida para Excluídos.',
+    });
+});
+
+router.patch("/:id/restaurar", async (req: TokenInterface, res: Response) => {
+    const tarefa = await prisma.tarefa.updateMany({
+        where: {
+            id: String(req.params.id),
+            usuarioId: req.usuarioId,
+            OR: [
+                { deletadoEm: { not: null } },
+                { arquivadoEm: { not: null } },
+            ],
+        },
+        data: {
+            deletadoEm: null,
+            arquivadoEm: null,
+        },
+    });
+
+    if (tarefa.count === 0) {
+        res.status(404).json({
+            erro: 'Tarefa não encontrada para restauração.',
+        });
+        return;
+    }
+
+    res.status(200).json({
+        mensagem: 'Tarefa restaurada com sucesso.',
+    });
+});
+
+router.get("/lixeira", async (req: TokenInterface, res: Response) => {
+    const tarefasLixeira = await prisma.tarefa.findMany({
+        where: {
+            usuarioId: req.usuarioId,
+            deletadoEm: { not: null },
+        },
+        orderBy: {
+            deletadoEm: 'desc',
+        },
+    });
+
+    res.status(200).json(tarefasLixeira);
+});
 
 export default router

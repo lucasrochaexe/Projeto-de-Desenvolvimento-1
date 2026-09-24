@@ -3,9 +3,10 @@ import { AgendaItem } from './AgendaForm';
 
 type AgendaListProps = {
     agendas: AgendaItem[];
+    onDetails: (agenda: AgendaItem) => void;
 };
 
-export function AgendaList({ agendas }: AgendaListProps) {
+export function AgendaList({ agendas, onDetails }: AgendaListProps) {
     return (
         <ScrollView contentContainerStyle={styles.list}>
         {agendas.map((item, index) => {
@@ -16,16 +17,19 @@ export function AgendaList({ agendas }: AgendaListProps) {
                     : '#559492';
 
             return (
-                <View key={index} style={styles.card}>
+                <View key={item.id} style={styles.card}>
                     <View style={[styles.priorityStripe, { backgroundColor: color }]} />
                     <View style={styles.details}>
                         <Text style={styles.title}>{item.titulo}</Text>
                         <Text style={styles.date}>Data de Início: {item.inicio}</Text>
                         <Text style={styles.date}>Data Final: <Text style={styles.dateValue}>{item.fim}</Text></Text>
                     </View>
-                    <Pressable style={[styles.detailsButton, { backgroundColor: color }]}>
-                        <Text style={styles.detailsButtonText}>Detalhes</Text>
-                    </Pressable>
+                        <Pressable
+                            style={[styles.detailsButton, { backgroundColor: color }]}
+                            onPress={() => onDetails(item)}
+                        >
+                            <Text style={styles.detailsButtonText}>Detalhes</Text>
+                        </Pressable>
                 </View>
             );
         })}

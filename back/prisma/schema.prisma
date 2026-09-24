@@ -35,6 +35,7 @@ model Tarefa {
   status       StatusTarefa  @default(EM_ANDAMENTO)
   dicas        String?
   deletadoEm   DateTime?
+  arquivadoEm  DateTime?
   usuario      Usuario       @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
   notificacoes Notificacao[]
   logs         Log[]

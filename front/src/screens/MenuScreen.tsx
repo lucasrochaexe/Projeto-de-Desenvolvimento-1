@@ -28,8 +28,8 @@ export function MenuScreen({ token, onLogout }: MenuScreenProps) {
   if (selectedScreen === 'Falar') return <OuvirScreen onBack={() => setSelectedScreen('')} falar={() => setSelectedScreen('')} />;
   if (selectedScreen === 'Escrever') return <ObservarScreen onBack={() => setSelectedScreen('')} />;
   if (selectedScreen === 'Agenda') return <AgendaScreen onBack={() => setSelectedScreen('')} token={token}/>;
-  if (selectedScreen === 'Arquivo') return <ArquivoScreen onBack={() => setSelectedScreen('')}/>;
-  if (selectedScreen === 'Excluidos') return <ExcluidosScreen onBack={() => setSelectedScreen('')}/>;
+  if (selectedScreen === 'Arquivo') return <ArquivoScreen onBack={() => setSelectedScreen('')} token={token}/>;
+  if (selectedScreen === 'Excluidos') return <ExcluidosScreen onBack={() => setSelectedScreen('')} token={token}/>;
   if (selectedScreen === 'Notificações') return <NotificaScreen onBack={() => setSelectedScreen('')}/>;
 
 

@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
 export type AgendaItem = {
+    id: string;
     titulo: string;
     inicio: string;
     fim: string;
@@ -10,12 +11,16 @@ export type AgendaItem = {
     prioridade: 'urgente' | 'importante' | 'media';
 };
 
+
+type NovaAgenda = Omit<AgendaItem, 'id'>;
+
 type AgendaFormProps = {
-    onConfirm: (agenda: AgendaItem) => void;
+    initialAgenda?: AgendaItem;
+    onConfirm: (agenda: NovaAgenda) => void;
     onCancel: () => void;
 };
 
-export function AgendaForm({ onConfirm, onCancel }: AgendaFormProps) {
+export function AgendaForm({ initialAgenda, onConfirm, onCancel }: AgendaFormProps) {
     const [titulo, setTitulo] = useState('');
     const [inicio, setInicio] = useState('');
     const [fim, setFim] = useState('');
@@ -23,6 +28,16 @@ export function AgendaForm({ onConfirm, onCancel }: AgendaFormProps) {
     const [obs, setObs] = useState('');
     const [prioridade, setPrioridade] = useState<AgendaItem['prioridade']>('media');
     const [obsHeight, setObsHeight] = useState(100);
+
+    useEffect(() => {
+        if (initialAgenda) {
+            setTitulo(initialAgenda.titulo);
+            setInicio(initialAgenda.inicio);
+            setFim(initialAgenda.fim);
+            setObs(initialAgenda.obs);
+            setPrioridade(initialAgenda.prioridade);
+        }
+    }, [initialAgenda]);
 
     const confirmar = () => {
         onConfirm({ titulo, inicio, fim, obs, prioridade });
