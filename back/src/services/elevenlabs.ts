@@ -15,7 +15,9 @@ async function obterUrlAssinada(): Promise<string> {
         `${API_URL}/v1/convai/conversation/get-signed-url?agent_id=${AGENT_ID}`,
         { headers: { "xi-api-key": API_KEY } }
     )
-    if (!resposta.ok) throw new Error("Falha ao obter URL assinada do ElevenLabs")
+    if (!resposta.ok) {
+        throw new Error(`Falha ao obter URL assinada do ElevenLabs (${resposta.status}): ${await resposta.text()}`)
+    }
     const { signed_url } = await resposta.json()
     return signed_url
 }
