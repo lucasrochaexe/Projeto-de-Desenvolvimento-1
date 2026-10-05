@@ -1,7 +1,21 @@
 import * as FileSystem from 'expo-file-system/legacy';
+import {
+    arquivarTarefaLocal,
+    atualizarTarefaLocal,
+    criarTarefaLocal,
+    excluirTarefaLocal,
+    listarArquivadasLocais,
+    listarExcluidasLocais,
+    listarTarefasLocais,
+    restaurarTarefaLocal,
+} from './tarefasLocais';
 
 export const API_URL =
     process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3000';
+
+// Por enquanto as tarefas ficam guardadas só no celular, não no back.
+// Para voltar a usar o back, defina EXPO_PUBLIC_TAREFAS_LOCAIS=false.
+const TAREFAS_NO_CELULAR = process.env.EXPO_PUBLIC_TAREFAS_LOCAIS !== 'false';
 
 type ApiOptions = RequestInit & {
     token?: string;
@@ -50,6 +64,10 @@ export async function cadastrarUsuario(
 }
 
 export async function buscarTarefas(token: string) {
+    if (TAREFAS_NO_CELULAR) {
+        return listarTarefasLocais();
+    }
+
     return apiRequest('/tarefas', {
         method: 'GET',
         token,
@@ -68,6 +86,10 @@ export async function criarTarefa(
         dicas?: string | null;
     }
 ) {
+    if (TAREFAS_NO_CELULAR) {
+        return criarTarefaLocal(tarefa);
+    }
+
     return apiRequest('/tarefas', {
         method: 'POST',
         token,
@@ -76,6 +98,10 @@ export async function criarTarefa(
 }
 
 export async function buscarTarefasArquivadas(token: string) {
+    if (TAREFAS_NO_CELULAR) {
+        return listarArquivadasLocais();
+    }
+
     return apiRequest('/tarefas/arquivo', {
         method: 'GET',
         token,
@@ -83,6 +109,10 @@ export async function buscarTarefasArquivadas(token: string) {
 }
 
 export async function buscarTarefasExcluidas(token: string) {
+    if (TAREFAS_NO_CELULAR) {
+        return listarExcluidasLocais();
+    }
+
     return apiRequest('/tarefas/lixeira', {
         method: 'GET',
         token,
@@ -90,6 +120,10 @@ export async function buscarTarefasExcluidas(token: string) {
 }
 
 export async function arquivarTarefa(token: string, id: string) {
+    if (TAREFAS_NO_CELULAR) {
+        return arquivarTarefaLocal(id);
+    }
+
     return apiRequest(`/tarefas/${id}/arquivar`, {
         method: 'PATCH',
         token,
@@ -97,6 +131,10 @@ export async function arquivarTarefa(token: string, id: string) {
 }
 
 export async function excluirTarefa(token: string, id: string) {
+    if (TAREFAS_NO_CELULAR) {
+        return excluirTarefaLocal(id);
+    }
+
     return apiRequest(`/tarefas/${id}`, {
         method: 'DELETE',
         token,
@@ -104,6 +142,10 @@ export async function excluirTarefa(token: string, id: string) {
 }
 
 export async function restaurarTarefa(token: string, id: string) {
+    if (TAREFAS_NO_CELULAR) {
+        return restaurarTarefaLocal(id);
+    }
+
     return apiRequest(`/tarefas/${id}/restaurar`, {
         method: 'PATCH',
         token,
@@ -122,6 +164,10 @@ export async function atualizarTarefa(
         status?: 'EM_ANDAMENTO' | 'CONCLUIDA' | 'EM_ATRASO';
     }
 ) {
+    if (TAREFAS_NO_CELULAR) {
+        return atualizarTarefaLocal(id, tarefa);
+    }
+
     return apiRequest(`/tarefas/${id}`, {
         method: 'PATCH',
         token,
@@ -129,7 +175,36 @@ export async function atualizarTarefa(
     });
 }
 
-export async function transcreverAudio(token: string, uri: string) {
+// JSON que o agente Dexter devolve depois que a pessoa confirma a tarefa.
+export type TarefaDoAgente = {
+    titulo: string;
+    descricao?: string | null;
+    prazo?: { data: string | null; hora: string | null } | null;
+    prioridade?: { nivel: string; motivo?: string } | null;
+    dicas?: { titulo: string; descricao: string }[] | null;
+};
+
+// Resposta das rotas /agent-chat/mensagem e /agent-chat/audio.
+// "transcricao" só vem na rota de áudio.
+export type RespostaAgente =
+    | { tipo: 'mensagem'; texto: string; transcricao?: string }
+    | { tipo: 'tarefa'; tarefa: TarefaDoAgente; transcricao?: string };
+
+export async function enviarMensagemAoAgente(
+    token: string,
+    texto: string
+): Promise<RespostaAgente> {
+    return apiRequest('/agent-chat/mensagem', {
+        method: 'POST',
+        token,
+        body: JSON.stringify({ texto }),
+    });
+}
+
+export async function enviarAudioAoAgente(
+    token: string,
+    uri: string
+): Promise<RespostaAgente> {
     const resposta = await FileSystem.uploadAsync(
         `${API_URL}/agent-chat/audio`,
         uri,
@@ -145,10 +220,56 @@ export async function transcreverAudio(token: string, uri: string) {
     const data = JSON.parse(resposta.body);
 
     if (resposta.status < 200 || resposta.status >= 300) {
-        throw new Error(data.erro || 'Erro ao transcrever o áudio');
+        throw new Error(data.erro || 'Erro ao enviar o áudio ao Dexter');
     }
 
-    return data.texto as string;
+    return data as RespostaAgente;
+}
+
+export async function reiniciarConversaComAgente(token: string) {
+    return apiRequest('/agent-chat/sessao', {
+        method: 'DELETE',
+        token,
+    });
+}
+
+function prazoDoAgenteParaISO(prazo: TarefaDoAgente['prazo']): string | null {
+    if (!prazo?.data) {
+        return null;
+    }
+
+    const [ano, mes, dia] = prazo.data.split('-').map(Number);
+    // Sem hora informada, o prazo vale até o fim do dia: o back marca a
+    // tarefa como atrasada assim que prazoFim passa.
+    const [hora, minuto] = prazo.hora
+        ? prazo.hora.split(':').map(Number)
+        : [23, 59];
+    const data = new Date(ano, mes - 1, dia, hora, minuto);
+
+    return Number.isNaN(data.getTime()) ? null : data.toISOString();
+}
+
+// Converte o JSON do agente para o formato de tarefa do app e salva
+// (no celular ou no back, conforme TAREFAS_NO_CELULAR).
+export async function salvarTarefaDoAgente(
+    token: string,
+    tarefa: TarefaDoAgente
+) {
+    const nivel = tarefa.prioridade?.nivel;
+
+    return criarTarefa(token, {
+        titulo: tarefa.titulo,
+        descricao: tarefa.descricao ?? null,
+        prioridade: nivel === 'ALTA' || nivel === 'BAIXA' ? nivel : 'MEDIA',
+        status: 'EM_ANDAMENTO',
+        prazoInic: null,
+        prazoFim: prazoDoAgenteParaISO(tarefa.prazo),
+        dicas: tarefa.dicas?.length
+            ? tarefa.dicas
+                .map((dica) => `${dica.titulo}: ${dica.descricao}`)
+                .join('\n')
+            : null,
+    });
 }
 
 export async function buscarNotificacoes(token: string) {

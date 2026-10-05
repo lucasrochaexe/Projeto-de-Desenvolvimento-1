@@ -2,7 +2,7 @@ from fastapi import FastAPI, UploadFile, File
 from faster_whisper import WhisperModel
 
 app = FastAPI()
-modelo = WhisperModel("medium", device="cpu", compute_type="int8")
+modelo = WhisperModel("small", device="cpu", compute_type="int8")
 
 def transcrever_arquivo(arquivo) -> str:
     segmentos, _ = modelo.transcribe(

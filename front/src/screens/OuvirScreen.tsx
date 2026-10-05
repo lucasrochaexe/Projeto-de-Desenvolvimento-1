@@ -1,4 +1,6 @@
 import { MenuBar } from "../utilidade/MenuBar";
+import { ChatMensagens } from "../utilidade/ChatMensagens";
+import { useAgente } from "../utilidade/useAgent";
 import { ScreenBackground } from "./ScreenBackground";
 import React, { useRef, useState } from "react";
 import {
@@ -8,6 +10,7 @@ import {
   TouchableWithoutFeedback,
   Image,
   StyleSheet,
+  View,
 } from "react-native";
 import {
   AudioModule,
@@ -15,7 +18,6 @@ import {
   setAudioModeAsync,
   useAudioRecorder,
 } from "expo-audio";
-import { transcreverAudio } from "../services/api";
 
 type OuvirScreenProps = {
   onBack: () => void;
@@ -30,7 +32,7 @@ export function OuvirScreen({ onBack, token }: OuvirScreenProps) {
   const gravandoRef = useRef(false);
 
   const [estado, setEstado] = useState<Estado>("parado");
-  const [texto, setTexto] = useState("");
+  const { mensagens, enviando, enviarAudio } = useAgente(token);
 
   async function pedirPermissao() {
     const { granted } = await AudioModule.requestRecordingPermissionsAsync();
@@ -63,13 +65,6 @@ export function OuvirScreen({ onBack, token }: OuvirScreenProps) {
     return gravador.uri;
   }
 
-  async function enviarParaTranscricao(uri: string) {
-    if (!token) {
-      throw new Error("Sessão expirada. Faça login novamente.");
-    }
-    return transcreverAudio(token, uri);
-  }
-
   const onPressIn = () => {
     Animated.spring(scaleAnim, {
       toValue: 1.2,
@@ -98,10 +93,10 @@ export function OuvirScreen({ onBack, token }: OuvirScreenProps) {
       }
 
       setEstado("enviando");
-      setTexto(await enviarParaTranscricao(uri));
-    } catch (error) {
-      const mensagem = error instanceof Error ? error.message : "Não foi possível transcrever o áudio. Tente novamente.";
-      Alert.alert("Erro", mensagem);
+      // Transcreve, conversa com o agente e salva a tarefa quando confirmada.
+      await enviarAudio(uri);
+    } catch {
+      Alert.alert("Erro", "Não foi possível finalizar a gravação. Tente novamente.");
     } finally {
       setEstado("parado");
     }
@@ -109,14 +104,20 @@ export function OuvirScreen({ onBack, token }: OuvirScreenProps) {
 
   const legenda =
     estado === 'gravando' ? 'Gravando... solte para enviar'
-    : estado === 'enviando' ? 'Transcrevendo...'
+    : estado === 'enviando' ? 'Enviando para o Dexter...'
     : 'Segure o botão para falar';
 
   return (
     <ScreenBackground source={require("../img/FundoEscutando.png")}>
       <MenuBar onBack={onBack} />
 
-      {texto !== "" && <Text style={styles.texto}>{texto}</Text>}
+      <View style={styles.conversa}>
+        <ChatMensagens
+          mensagens={mensagens}
+          digitando={enviando}
+          espacoInferior={190}
+        />
+      </View>
       <Text style={styles.legenda}>{legenda}</Text>
 
       <Animated.View
@@ -148,12 +149,8 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 14,
   },
-  texto: {
+  conversa: {
+    flex: 1,
     marginTop: 24,
-    backgroundColor: 'rgba(255, 255, 255, 0.94)',
-    borderRadius: 10,
-    color: '#27231F',
-    fontSize: 16,
-    padding: 16,
   },
 });
