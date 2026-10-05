@@ -1,25 +1,25 @@
 import { useState } from 'react';
-import { TextInput, View, TouchableOpacity, KeyboardAvoidingView, Platform, Image, Text } from 'react-native';
+import { TextInput, View, TouchableOpacity, KeyboardAvoidingView, Platform, Image } from 'react-native';
 import { MenuBar } from '../utilidade/MenuBar';
 import { ScreenBackground } from './ScreenBackground';
 import { screenStyles } from './screenStyles';
 
-
+import { ChatMensagens } from '../utilidade/ChatMensagens';
+import { useAgente } from '../utilidade/useAgent';
 
 type ObservarScreenProps = {
   onBack: () => void;
+  token: string | null;
 };
 
-export function ObservarScreen({ onBack }: ObservarScreenProps) {
+export function ObservarScreen({ onBack, token }: ObservarScreenProps) {
   const [text, setText] = useState('');
-  const [mensagens, setMensagens] = useState<string[]>([]);
+  const { mensagens, enviando, enviarTexto } = useAgente(token);
 
   const handleSend = () => {
-    if (text.trim() === '') return;
-    
-    console.log('Texto digitado:', text);
+    if (text.trim() === '' || enviando) return;
 
-    setMensagens((mensagensAtuais) => [...mensagensAtuais, text]);
+    enviarTexto(text);
     setText('');
   };
 
@@ -32,11 +32,11 @@ export function ObservarScreen({ onBack }: ObservarScreenProps) {
         <MenuBar onBack={onBack} />
 
         <View style={screenStyles.areaMensagens}>
-          {mensagens.map((mensagem, index) => (
-            <View key={index} style={screenStyles.bolhaMensagem}>
-              <Text style={screenStyles.textoMensagem}>{mensagem}</Text>
-            </View>
-          ))}
+          <ChatMensagens
+            mensagens={mensagens}
+            digitando={enviando}
+            espacoInferior={180}
+          />
         </View>
 
         <View style={screenStyles.messageContainer}>
@@ -53,8 +53,9 @@ export function ObservarScreen({ onBack }: ObservarScreenProps) {
 
           {/* Botão de enviar */}
           <TouchableOpacity
-            style={screenStyles.sendButton}
+            style={[screenStyles.sendButton, enviando && { opacity: 0.5 }]}
             onPress={handleSend}
+            disabled={enviando}
             activeOpacity={0.7}
           >
             <Image
