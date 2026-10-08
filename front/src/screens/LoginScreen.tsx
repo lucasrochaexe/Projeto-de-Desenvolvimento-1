@@ -163,6 +163,7 @@ export function LoginScreen({ onLogin, onRegister }: LoginScreenProps) {
         <TouchableOpacity onPress={handleRegister} style={loginStyles.secondaryButton}>
           <Text style={loginStyles.secondaryButtonText}>Cadastrar</Text>
         </TouchableOpacity>
+        <Text style={loginStyles.footerText}>2026 - Dexter©  todos direitos reservados</Text>
       </ScrollView>
     </KeyboardAvoidingView>
   );

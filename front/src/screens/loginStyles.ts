@@ -192,4 +192,10 @@ export const loginStyles = StyleSheet.create({
     lineHeight: 25,
     marginBottom: 12,
   },
+  footerText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    textAlign: 'center',
+    marginTop: 20,
+  },
 });

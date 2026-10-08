@@ -12,6 +12,7 @@ import {
     criarTarefa,
     excluirTarefa,
 } from '../services/api';
+import {Text} from 'react-native';
 
 type AgendaScreenProps = {
   onBack: () => void;
@@ -235,6 +236,8 @@ export function AgendaScreen({ onBack, token, initialAgendaId }: AgendaScreenPro
   return (
     <ScreenBackground>
       <MenuBar onBack={onBack} title="Agenda" showAdd={true} onAdd={handleAdd} />
+      
+      <Text style={{ textAlign: 'center', marginBottom: 16, marginTop: 16, color: '#858383' }}>Lista de tarefas criadas</Text>
       <AgendaList
         agendas={agendas}
         onDetails={(agenda) => setAgendaSelecionada(agenda)}

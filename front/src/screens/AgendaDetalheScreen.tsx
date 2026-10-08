@@ -193,7 +193,7 @@ const styles = StyleSheet.create({
     borderColor: '#C7DCEB',
   },
   containerDeleted: {
-    backgroundColor: '#F1F3F5',
+    backgroundColor: '#e1e0e0',
     borderColor: '#D5D9DE',
   },
   title: {

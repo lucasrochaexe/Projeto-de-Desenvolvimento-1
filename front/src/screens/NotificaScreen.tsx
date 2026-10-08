@@ -103,6 +103,7 @@ export function NotificaScreen({
     <ScreenBackground>
       <MenuBar onBack={onBack} title="Notificações" />
 
+      <Text style={{ textAlign: 'center', marginBottom: 16, marginTop: 16, color: '#858383' }}>Notificações de tarefas diarias</Text>
       <View style={styles.content}>
         <ScrollView
           contentContainerStyle={styles.list}

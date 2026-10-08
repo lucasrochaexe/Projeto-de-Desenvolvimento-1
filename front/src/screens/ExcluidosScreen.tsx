@@ -6,6 +6,7 @@ import { AgendaList } from '../utilidade/AgendaList';
 import { buscarTarefasExcluidas, restaurarTarefa } from '../services/api';
 import { AgendaDetalheScreen } from './AgendaDetalheScreen';
 import { ScreenBackground } from './ScreenBackground';
+import {Text} from 'react-native';
 
 type ExcluidosScreenProps = {
   onBack: () => void;
@@ -83,6 +84,7 @@ export function ExcluidosScreen({ onBack, token }: ExcluidosScreenProps) {
   return (
     <ScreenBackground>
       <MenuBar onBack={onBack} title="Itens Excluídos" />
+      <Text style={{ textAlign: 'center', marginBottom: 16, marginTop: 16, marginRight: 16, marginLeft: 16, color: '#858383', width: '90%' }}>Lista de tarefas excluídas - permanentemente após 7 dias</Text>
       <AgendaList
         agendas={agendas}
         compact

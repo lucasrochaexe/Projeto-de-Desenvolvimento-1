@@ -97,7 +97,7 @@ const styles = StyleSheet.create({
         borderColor: '#C7DCEB',
     },
     deletedCard: {
-        backgroundColor: '#d7d7da',
+        backgroundColor: '#e1e0e0',
         borderColor: '#D5D9DE',
     },
     priorityStripe: {

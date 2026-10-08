@@ -123,10 +123,18 @@ export function OuvirScreen({ onBack, token }: OuvirScreenProps) {
       <Animated.View
         style={[styles.micButton, { transform: [{ scale: scaleAnim }] }]}
       >
-        <TouchableWithoutFeedback disabled={estado === "enviando"} onPressIn={onPressIn} onPressOut={onPressOut}>
+        <TouchableWithoutFeedback
+          disabled={estado === "enviando" || enviando}
+          onPressIn={onPressIn}
+          onPressOut={onPressOut}
+        >
           <Image source={require("../img/falar.png")} style={styles.micIcon} />
         </TouchableWithoutFeedback>
       </Animated.View>
+
+      <View style={styles.hintContainer}>
+        <Text style={styles.hintText}>← Segure para falar</Text>
+      </View>
     </ScreenBackground>
   );
 }
@@ -153,4 +161,15 @@ const styles = StyleSheet.create({
     flex: 1,
     marginTop: 24,
   },
+  hintContainer: {
+  position: "absolute",
+  bottom: 90,
+  left: "60%", // ajuste conforme layout
+},
+hintText: {
+  color: "#a4a2a2",
+  fontSize: 10,
+  marginLeft: 25,
+  marginBottom: 5,
+},
 });

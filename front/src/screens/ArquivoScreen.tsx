@@ -10,6 +10,7 @@ import {
     excluirTarefa,
     restaurarTarefa,
 } from '../services/api';
+import {Text} from 'react-native';
 
 type ArquivoScreenProps = {
     onBack: () => void;
@@ -128,6 +129,8 @@ export function ArquivoScreen({
                 onBack={onBack}
                 title="Arquivo"
             />
+            
+        <Text style={{ textAlign: 'center', marginBottom: 16, marginTop: 16, color: '#858383' }}>Lista de tarefas arquivadas</Text>
 
             <AgendaList
                 agendas={agendas}
