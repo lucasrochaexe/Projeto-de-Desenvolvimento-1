@@ -131,6 +131,8 @@ export function ArquivoScreen({
 
             <AgendaList
                 agendas={agendas}
+                compact
+                status="arquivo"
                 onDetails={(agenda) => {
                     setAgendaSelecionada(agenda);
                 }}

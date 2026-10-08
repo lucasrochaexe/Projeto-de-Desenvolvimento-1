@@ -25,6 +25,7 @@ export function AgendaDetalhesScreen
             ]
         );
     }
+    
 
         return (
         <ScreenBackground>
@@ -84,7 +85,7 @@ export function AgendaDetalhesScreen
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: '#D9D9D9',
+        backgroundColor: '#f7f7f7',
         marginTop: 16,
         padding: 18,
     },

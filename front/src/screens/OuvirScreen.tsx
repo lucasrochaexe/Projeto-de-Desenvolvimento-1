@@ -109,7 +109,7 @@ export function OuvirScreen({ onBack, token }: OuvirScreenProps) {
 
   return (
     <ScreenBackground source={require("../img/FundoEscutando.png")}>
-      <MenuBar onBack={onBack} />
+      <MenuBar onBack={onBack} title="Falar" />
 
       <View style={styles.conversa}>
         <ChatMensagens

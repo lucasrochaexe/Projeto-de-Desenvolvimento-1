@@ -29,7 +29,7 @@ export function ObservarScreen({ onBack, token }: ObservarScreenProps) {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={screenStyles.keyboardContainer}
       >
-        <MenuBar onBack={onBack} />
+        <MenuBar onBack={onBack} title="Escrever" />
 
         <View style={screenStyles.areaMensagens}>
           <ChatMensagens

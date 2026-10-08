@@ -60,7 +60,7 @@ cron.schedule('0 * * * *', async () => {
   const agora = new Date()
 
   const limiteDosProximos15Dias = new Date(agora)
-  limiteDosProximos15Dias.setDate(limiteDosProximos15Dias.getDate() + 15)
+  limiteDosProximos15Dias.setDate(limiteDosProximos15Dias.getDate() + 7)
 
   try {
     const tarefasVencendo = await prisma.tarefa.findMany({

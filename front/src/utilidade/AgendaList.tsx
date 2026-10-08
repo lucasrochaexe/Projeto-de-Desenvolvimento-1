@@ -4,9 +4,16 @@ import { AgendaItem } from './AgendaForm';
 type AgendaListProps = {
     agendas: AgendaItem[];
     onDetails: (agenda: AgendaItem) => void;
+    compact?: boolean;
+    status?: 'ativa' | 'arquivo' | 'excluidos';
 };
 
-export function AgendaList({ agendas, onDetails }: AgendaListProps) {
+export function AgendaList({
+    agendas,
+    onDetails,
+    compact = false,
+    status = 'ativa',
+}: AgendaListProps) {
     const ordemPrioridade ={
         urgente: 0,
         importante: 1,
@@ -27,16 +34,25 @@ export function AgendaList({ agendas, onDetails }: AgendaListProps) {
                     : '#559492';
 
             return (
-                <View key={item.id} style={styles.card}>
+                <View
+                    key={item.id}
+                    style={[
+                        styles.card,
+                        compact && styles.compactCard,
+                        status === 'arquivo' && styles.archivedCard,
+                        status === 'excluidos' && styles.deletedCard,
+                    ]}
+                >
                     <View style={[styles.priorityStripe, { backgroundColor: color }]} />
-                    <View style={styles.details}>
-                        <Text style={styles.title}>{item.titulo}</Text>
+                    <View style={[styles.details, compact && styles.compactDetails]}>
+                        <Text style={[styles.title, compact && styles.compactTitle]}>{item.titulo}</Text>
                         <Text style={styles.date}>Data de Início: {item.inicio}</Text>
                         <Text style={styles.date}>Data Final: <Text style={styles.dateValue}>{item.fim}</Text></Text>
                     </View>
                     <Pressable
                         style={({ pressed }) => [
                             styles.detailsButton,
+                            compact && styles.compactDetailsButton,
                             pressed && styles.detailsButtonPressed,
                         ]}
                         onPress={() => onDetails(item)}
@@ -56,7 +72,7 @@ const styles = StyleSheet.create({
         paddingTop: 16,
     },
     card: {
-        backgroundColor: '#EEF0F2',
+        backgroundColor: '#FFFFFF',
         borderColor: 'rgba(39, 35, 31, 0.10)',
         borderRadius: 16,
         borderWidth: 1,
@@ -73,6 +89,17 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.10,
         shadowRadius: 5,
     },
+    compactCard: {
+        minHeight: 68,
+    },
+    archivedCard: {
+        backgroundColor: '#EEF6FC',
+        borderColor: '#C7DCEB',
+    },
+    deletedCard: {
+        backgroundColor: '#F1F3F5',
+        borderColor: '#D5D9DE',
+    },
     priorityStripe: {
         width: 6,
     },
@@ -82,11 +109,19 @@ const styles = StyleSheet.create({
         paddingHorizontal: 14,
         paddingVertical: 13,
     },
+    compactDetails: {
+        paddingHorizontal: 10,
+        paddingVertical: 8,
+    },
     title: {
         color: '#191919',
         fontSize: 15,
         fontWeight: '700',
         marginBottom: 7,
+    },
+    compactTitle: {
+        fontSize: 13,
+        marginBottom: 3,
     },
     date: {
         color: '#6B6B6B',
@@ -108,6 +143,11 @@ const styles = StyleSheet.create({
         marginRight: 12,
         minHeight: 38,
         paddingHorizontal: 11,
+    },
+    compactDetailsButton: {
+        minHeight: 32,
+        marginRight: 8,
+        paddingHorizontal: 8,
     },
     detailsButtonText: {
         color: '#3E444B',

@@ -22,17 +22,33 @@ export function AgendaDetalheScreen({
   onExcluir,
   onRestaurar,
 }: AgendaDetalheScreenProps) {
+  const status = modo === 'arquivo'
+  ? {
+      label: 'Arquivada',
+      style: styles.statusUnknown,
+    }
+  : modo === 'excluidos'
+    ? {
+        label: 'Excluída',
+        style: styles.statusLate,
+      }
+    : getStatusPrazo(agenda.fim);
+
+    /* define cor do card de acordo com o status */
+  const cardStatusStyle = modo === 'arquivo'
+    ? styles.containerArchived
+    : modo === 'excluidos'
+      ? styles.containerDeleted
+      : null;
+
   return (
     <ScreenBackground>
-      <MenuBar onBack={onBack} title="Detalhes" />
+      <MenuBar onBack={onBack} title="Detalhes da Tarefa" />
 
-      <View style={styles.container}>
+      <View style={[styles.container, cardStatusStyle]}>
         <Text style={styles.title}>{agenda.titulo}</Text>
-        <Text style={[
-          styles.status,
-          getStatusPrazo(agenda.fim).style,
-        ]}>
-          {getStatusPrazo(agenda.fim).label}
+        <Text style={[styles.status, status.style]}>
+          {status.label}
         </Text>
         <Text style={styles.label}>Data de início</Text>
         <Text style={styles.value}>{agenda.inicio || 'Não informada'}</Text>
@@ -129,6 +145,14 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.10,
     shadowRadius: 6,
+  },
+  containerArchived: {
+    backgroundColor: '#EEF6FC',
+    borderColor: '#C7DCEB',
+  },
+  containerDeleted: {
+    backgroundColor: '#F1F3F5',
+    borderColor: '#D5D9DE',
   },
   title: {
     color: '#191919',

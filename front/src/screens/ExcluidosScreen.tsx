@@ -85,6 +85,8 @@ export function ExcluidosScreen({ onBack, token }: ExcluidosScreenProps) {
       <MenuBar onBack={onBack} title="Itens Excluídos" />
       <AgendaList
         agendas={agendas}
+        compact
+        status="excluidos"
         onDetails={(agenda) => setAgendaSelecionada(agenda)}
       />
     </ScreenBackground>
