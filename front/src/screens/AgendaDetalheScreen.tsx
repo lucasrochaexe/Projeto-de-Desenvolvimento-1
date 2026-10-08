@@ -2,6 +2,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { AgendaItem } from '../utilidade/AgendaForm';
 import { MenuBar } from '../utilidade/MenuBar';
 import { ScreenBackground } from './ScreenBackground';
+import { Alert } from 'react-native';
 
 type AgendaDetalheScreenProps = {
   agenda: AgendaItem;
@@ -41,6 +42,46 @@ export function AgendaDetalheScreen({
       ? styles.containerDeleted
       : null;
 
+  const arquivar = () => {
+    Alert.alert(
+      'Arquivar agendamento',
+      'Tem certeza que deseja arquivar este agendamento?',
+      [
+        {
+          text: 'Cancelar',
+          style: 'cancel',
+        },
+        {
+          text: 'Arquivar',
+          style: 'destructive',
+          onPress: () => {
+            onArquivar && onArquivar();
+          },
+        },
+      ]
+    );
+  };
+
+  const excluir = () => {
+    Alert.alert(
+      'Excluir Tarefa',
+      'Tem certeza que deseja excluir esta tarefa?',
+      [
+        {
+          text: 'Cancelar',
+          style: 'cancel',
+        },
+        {
+          text: 'Excluir',
+          style: 'destructive',
+          onPress: () => {
+            onExcluir && onExcluir();
+          },
+        },
+      ]
+    );
+  };
+
   return (
     <ScreenBackground>
       <MenuBar onBack={onBack} title="Detalhes da Tarefa" />
@@ -73,16 +114,17 @@ export function AgendaDetalheScreen({
                 styles.button,
                 pressed && styles.buttonPressed,
               ]}
-              onPress={onArquivar}
+              onPress={arquivar}   // chama a função com confirmação
             >
               <Text style={styles.buttonText}>Arquivar</Text>
             </Pressable>
+
             <Pressable
               style={({ pressed }) => [
                 styles.deleteButton,
                 pressed && styles.deleteButtonPressed,
               ]}
-              onPress={onExcluir}
+              onPress={excluir}   // agora chama a função que mostra o Alert
             >
               <Text style={styles.deleteButtonText}>Excluir</Text>
             </Pressable>
@@ -105,7 +147,7 @@ export function AgendaDetalheScreen({
                 styles.deleteButton,
                 pressed && styles.deleteButtonPressed,
               ]}
-              onPress={onExcluir}
+              onPress={excluir}   // agora chama a função que mostra o Alert
             >
               <Text style={styles.deleteButtonText}>Excluir</Text>
             </Pressable>
