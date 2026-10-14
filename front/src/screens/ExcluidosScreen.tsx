@@ -35,6 +35,7 @@ export function ExcluidosScreen({ onBack, token }: ExcluidosScreenProps) {
           ? new Date(tarefa.prazoFim).toLocaleDateString('pt-BR')
           : '',
         obs: tarefa.descricao || '',
+        dicas: tarefa.dicas || null,
         prioridade: tarefa.prioridade === 'ALTA'
           ? 'urgente'
           : tarefa.prioridade === 'MEDIA'

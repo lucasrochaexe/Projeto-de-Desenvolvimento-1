@@ -8,6 +8,7 @@ export type AgendaItem = {
     inicio: string;
     fim: string;
     obs: string;
+    dicas?: string | null;
     prioridade: 'urgente' | 'importante' | 'media';
 };
 

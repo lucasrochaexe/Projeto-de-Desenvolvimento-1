@@ -16,9 +16,13 @@ export const loginStyles = StyleSheet.create({
     width: undefined,
   },
   content: {
-    flex: 1,
     justifyContent: 'center',
     paddingHorizontal: 32,
+  },
+  formScrollContent: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    paddingVertical: 24,
   },
   logo: {
     alignSelf: 'center',
@@ -33,6 +37,9 @@ export const loginStyles = StyleSheet.create({
     marginBottom: 18,
     position: 'relative',
     width: 210,
+  },
+  loginLogoContainer: {
+    marginTop: 80,
   },
   orbita: {
     borderColor: '#D5A23A',
@@ -72,16 +79,6 @@ export const loginStyles = StyleSheet.create({
     color: '#252525',
     fontSize: 16,
     height: 54,
-    marginBottom: 14,
-    paddingHorizontal: 16,
-  },
-  input2: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 10,
-    color: '#252525',
-    fontSize: 16,
-    height: 20,
-    width: '80%',
     marginBottom: 14,
     paddingHorizontal: 16,
   },

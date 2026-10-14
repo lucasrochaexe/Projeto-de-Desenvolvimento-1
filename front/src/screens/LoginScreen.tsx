@@ -94,7 +94,7 @@ export function LoginScreen({ onLogin, onRegister, onRecoverPassword }: LoginScr
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        <View style={loginStyles.logoContainer}>
+        <View style={[loginStyles.logoContainer, loginStyles.loginLogoContainer]}>
           <View style={loginStyles.orbita} />
 
           <Animated.View

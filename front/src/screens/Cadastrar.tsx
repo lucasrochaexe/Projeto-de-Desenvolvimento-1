@@ -1,7 +1,7 @@
 
 import { StatusBar } from "expo-status-bar";
 import { useState } from "react";
-import { Alert, Image, KeyboardAvoidingView, Platform, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Alert, Image, KeyboardAvoidingView, Platform, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { loginStyles } from "./loginStyles";
 import { cadastrarUsuario } from '../services/api';
 
@@ -62,12 +62,17 @@ export function Cadastrar({ onCadastrar, onCancelar }: CadastrarProps) {
 
     return (
         <KeyboardAvoidingView
-            behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             style={loginStyles.container}
         >
             <StatusBar style="light" />
             <Image source={require('../../assets/2.png')} style={loginStyles.background} resizeMode="cover" />
-            <View style={loginStyles.content}>
+            <ScrollView
+                contentContainerStyle={loginStyles.formScrollContent}
+                keyboardShouldPersistTaps="handled"
+                showsVerticalScrollIndicator={false}
+            >
+                <View style={loginStyles.content}>
                 <Image source={require('../../assets/logoBranco - Copia.png')} style={loginStyles.logo} resizeMode="contain" />
                 <Text style={loginStyles.heading}>Cadastrar</Text>
                 <Text style={loginStyles.subtitle}>Crie sua conta Dexter</Text>
@@ -109,7 +114,8 @@ export function Cadastrar({ onCadastrar, onCancelar }: CadastrarProps) {
                 <TouchableOpacity onPress={hamdleCancelar} style={loginStyles.secondaryButton}>
                     <Text style={loginStyles.secondaryButtonText}>Cancelar</Text>
                 </TouchableOpacity>
-            </View>
+                </View>
+            </ScrollView>
         </KeyboardAvoidingView>
     );
 }

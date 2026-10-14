@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { AgendaItem } from '../utilidade/AgendaForm';
 import { MenuBar } from '../utilidade/MenuBar';
 import { ScreenBackground } from './ScreenBackground';
@@ -86,7 +86,12 @@ export function AgendaDetalheScreen({
     <ScreenBackground>
       <MenuBar onBack={onBack} title="Detalhes da Tarefa" />
 
-      <View style={[styles.container, cardStatusStyle]}>
+      <ScrollView
+        style={styles.scroll}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator
+      >
+        <View style={[styles.container, cardStatusStyle]}>
         <Text style={styles.title}>{agenda.titulo}</Text>
         <Text style={[styles.status, status.style]}>
           {status.label}
@@ -97,6 +102,12 @@ export function AgendaDetalheScreen({
         <Text style={styles.value}>{agenda.fim || 'Não informada'}</Text>
         <Text style={styles.label}>Descritivo</Text>
         <Text style={styles.description}>{agenda.obs || 'Nenhum descritivo informado.'}</Text>
+        {!!agenda.dicas && (
+          <>
+            <Text style={styles.label}>Dicas da IA</Text>
+            <Text style={styles.tips}>{agenda.dicas}</Text>
+          </>
+        )}
 
         {modo === 'ativa' && (
           <>
@@ -165,12 +176,19 @@ export function AgendaDetalheScreen({
             <Text style={styles.buttonText}>Restaurar</Text>
           </Pressable>
         )}
-      </View>
+        </View>
+      </ScrollView>
     </ScreenBackground>
   );
 }
 
 const styles = StyleSheet.create({
+  scroll: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingBottom: 24,
+  },
   container: {
     backgroundColor: '#FFFFFF',
     borderColor: 'rgba(39, 35, 31, 0.10)',
@@ -240,6 +258,12 @@ const styles = StyleSheet.create({
     color: '#191919',
     fontSize: 15,
     minHeight: 100,
+    marginTop: 4,
+    lineHeight: 22,
+  },
+  tips: {
+    color: '#4B4B4B',
+    fontSize: 15,
     marginTop: 4,
     lineHeight: 22,
   },

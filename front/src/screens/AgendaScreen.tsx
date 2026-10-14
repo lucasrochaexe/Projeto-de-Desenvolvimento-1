@@ -69,6 +69,7 @@ export function AgendaScreen({ onBack, token, initialAgendaId }: AgendaScreenPro
             ? new Date(tarefa.prazoFim).toLocaleDateString('pt-BR')
             : '',
           obs: tarefa.descricao || '',
+          dicas: tarefa.dicas || null,
           prioridade:
             tarefa.prioridade === 'ALTA'
               ? 'urgente'
@@ -123,6 +124,7 @@ export function AgendaScreen({ onBack, token, initialAgendaId }: AgendaScreenPro
           inicio: newAgenda.inicio,
           fim: newAgenda.fim,
           obs: tarefaCriada.descricao || '',
+          dicas: tarefaCriada.dicas || null,
           prioridade: newAgenda.prioridade,
         },
       ]);
@@ -154,6 +156,7 @@ export function AgendaScreen({ onBack, token, initialAgendaId }: AgendaScreenPro
 
       const agendaAtualizada: AgendaItem = {
         id: agendaSelecionada.id,
+        dicas: agendaSelecionada.dicas,
         ...dados,
       };
 
