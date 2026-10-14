@@ -42,6 +42,8 @@ router.post("/", async (req: TokenInterface, res: Response) => {
         return
     }
 
+    console.log("dicas recebidas:", valida.data.dicas)
+
     const { titulo, descricao, prioridade, status, prazoInic, prazoFim, dicas } = valida.data
 
     try {
