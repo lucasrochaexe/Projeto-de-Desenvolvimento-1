@@ -5,6 +5,11 @@ export const loginStyles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#383838',
   },
+  container2: {
+    flex: 1,
+    backgroundColor: '#383838',
+    justifyContent: 'center',
+  },
   background: {
     ...StyleSheet.absoluteFill,
     height: undefined,
@@ -70,6 +75,16 @@ export const loginStyles = StyleSheet.create({
     marginBottom: 14,
     paddingHorizontal: 16,
   },
+  input2: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 10,
+    color: '#252525',
+    fontSize: 16,
+    height: 20,
+    width: '80%',
+    marginBottom: 14,
+    paddingHorizontal: 16,
+  },
   passwordWrapper: {
     position: 'relative',
   },
@@ -98,10 +113,24 @@ export const loginStyles = StyleSheet.create({
     fontWeight: '700',
   },
   rememberRow: {
-    alignItems: 'center',
-    flexDirection: 'row',
+    alignItems: 'flex-start',
+    flexDirection: 'column',
+    justifyContent: 'space-between',
     marginBottom: 8,
     minHeight: 40,
+  },
+  rememberOption: {
+    alignItems: 'center',
+    flexDirection: 'row',
+  },
+  forgotButton: {
+    paddingVertical: 8,
+  },
+  forgotText: {
+    color: '#8A651C',
+    fontSize: 13,
+    fontWeight: '700',
+    marginTop: 9,
   },
   checkbox: {
     alignItems: 'center',
@@ -197,5 +226,25 @@ export const loginStyles = StyleSheet.create({
     fontSize: 14,
     textAlign: 'center',
     marginTop: 20,
+  },
+  title: {
+    color: '#FFFFFF',
+    fontSize: 24,
+    fontWeight: '700',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  button: {
+    backgroundColor: '#D5A23A',
+    borderRadius: 10,
+    height: 50,
+    justifyContent: 'center',
+    marginTop: 20,
+  },
+  buttonText: {
+    color: '#2B2520',
+    fontSize: 16,
+    fontWeight: '700',
+    textAlign: 'center',
   },
 });

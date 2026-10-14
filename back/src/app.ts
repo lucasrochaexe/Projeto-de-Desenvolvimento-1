@@ -17,6 +17,7 @@ const app = express()
 const port = 3000
 
 app.use(express.json())
+app.use(express.urlencoded({ extended: false }))
 app.use(cors())
 
 app.get('/', (req, res) => {
@@ -25,7 +26,7 @@ app.get('/', (req, res) => {
 
 // Rotas Públicas
 app.use("/usuarios", routesUsuarios)
-app.use("/auth/login", routesAutorizacao)
+app.use("/auth", routesAutorizacao)
 
 
 // Middleware + Segurança

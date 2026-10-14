@@ -8,10 +8,11 @@ import { fazerLogin } from '../services/api';
 type LoginScreenProps = {
   onLogin: (token: string) => void;
   onRegister: () => void;
+  onRecoverPassword: () => void;
 };
 
 
-export function LoginScreen({ onLogin, onRegister }: LoginScreenProps) {
+export function LoginScreen({ onLogin, onRegister, onRecoverPassword }: LoginScreenProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -150,12 +151,22 @@ export function LoginScreen({ onLogin, onRegister }: LoginScreenProps) {
           </Pressable>
         </View>
 
-        <Pressable onPress={() => setRememberLogin((remembered) => !remembered)} style={loginStyles.rememberRow}>
-          <View style={[loginStyles.checkbox, rememberLogin && loginStyles.checkboxSelected]}>
-            {rememberLogin && <Text style={loginStyles.checkboxMark}>✓</Text>}
-          </View>
-          <Text style={loginStyles.rememberText}>Lembrar meus dados</Text>
-        </Pressable>
+        <View style={loginStyles.rememberRow}>
+          <Pressable
+            accessibilityRole="checkbox"
+            accessibilityState={{ checked: rememberLogin }}
+            onPress={() => setRememberLogin((remembered) => !remembered)}
+            style={loginStyles.rememberOption}
+          >
+            <View style={[loginStyles.checkbox, rememberLogin && loginStyles.checkboxSelected]}>
+              {rememberLogin && <Text style={loginStyles.checkboxMark}>✓</Text>}
+            </View>
+            <Text style={loginStyles.rememberText}>Lembrar meus dados</Text>
+          </Pressable>
+          <Pressable onPress={onRecoverPassword} style={loginStyles.forgotButton}>
+            <Text style={loginStyles.forgotText}>Esqueci minha senha</Text>
+          </Pressable>
+        </View>
 
         <TouchableOpacity onPress={handleLogin} style={loginStyles.primaryButton}>
           <Text style={loginStyles.primaryButtonText}>Entrar</Text>

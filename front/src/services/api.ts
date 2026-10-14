@@ -9,23 +9,33 @@ type ApiOptions = RequestInit & {
 
 export async function apiRequest(path: string, options: ApiOptions = {}) {
   const { token, headers, ...requestOptions } = options;
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 20000);
 
-  const response = await fetch(`${API_URL}${path}`, {
-    ...requestOptions,
-    headers: {
-      "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...headers,
-    },
-  });
+  try {
+    const response = await fetch(`${API_URL}${path}`, {
+      ...requestOptions,
+      signal: controller.signal,
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...headers,
+      },
+    });
 
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.erro || "Erro na comunicaÃ§Ã£o com o servidor");
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.erro || "Erro na comunicação com o servidor");
+    }
+    return data;
+  } catch (error) {
+    if (error instanceof Error && error.name === "AbortError") {
+      throw new Error("O servidor demorou para responder. Verifique o SMTP e tente novamente.");
+    }
+    throw error;
+  } finally {
+    clearTimeout(timeout);
   }
-
-  return data;
 }
 
 export async function fazerLogin(email: string, senha: string) {
@@ -48,6 +58,13 @@ export async function cadastrarUsuario(
 
 export async function buscarTarefas(token: string) {
   return apiRequest("/tarefas", { method: "GET", token });
+}
+
+export async function recuperarSenha(email: string) {
+  return apiRequest("/auth/recuperar-senha", {
+    method: "POST",
+    body: JSON.stringify({ email }),
+  });
 }
 
 export async function criarTarefa(

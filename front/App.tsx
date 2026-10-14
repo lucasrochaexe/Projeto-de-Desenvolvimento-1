@@ -6,6 +6,7 @@ import { LoginScreen } from './src/screens/LoginScreen';
 import { Cadastrar } from './src/screens/Cadastrar';
 import { SobreDexter } from './src/screens/SobreDexter';
 import { MenuScreen } from './src/screens/MenuScreen';
+import { RecuperarSenha } from './src/screens/RecuperarSenha';
 
 
 
@@ -22,6 +23,7 @@ export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
   const [showAbout, setShowAbout] = useState(false);
+  const [showRecoverPassword, setShowRecoverPassword] = useState(false);
   const rotacao = useRef(new Animated.Value(0)).current;
   useEffect(() => {
     const animacaoOrbita = Animated.loop(
@@ -73,6 +75,14 @@ if (showAbout) {
   );
 }
 
+if (showRecoverPassword) {
+  return (
+    <RecuperarSenha
+      onVoltar={() => setShowRecoverPassword(false)}
+    />
+  );
+}
+
 return (
   <LoginScreen
     onLogin={(novoToken) => {
@@ -80,6 +90,7 @@ return (
       setIsLoggedIn(true);
     }}
     onRegister={() => setShowAbout(true)}
+    onRecoverPassword={() => setShowRecoverPassword(true)}
   />
 );
     }
@@ -142,5 +153,4 @@ return (
     </View>
   );
 }
-
 
