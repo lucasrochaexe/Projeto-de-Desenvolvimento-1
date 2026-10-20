@@ -1,76 +1,98 @@
-# Dexter - Assistente de Administração com IA 🧠📅
+<div align="center">
 
-![Status](https://img.shields.io/badge/Status-Em%20Desenvolvimento-yellow)
-![Versão](https://img.shields.io/badge/Vers%C3%A3o-0.1.0-blue)
-![Python](https://img.shields.io/badge/Python-3.10%2B-blue)
-![React Native](https://img.shields.io/badge/React_Native-Front--end-blueviolet)
-![Neon Postgres](https://img.shields.io/badge/Neon-Postgres-336791)
-![ElevenLabs](https://img.shields.io/badge/ElevenLabs-IA%20%26%20Voice-black)
+# 🤖 Dexter — Assistente Pessoal Inteligente com IA
 
-## 📌 Sobre o Projeto
+**Gerenciamento inteligente de rotinas e tarefas por comando de voz, texto e quadro Kanban.**
 
-O **Dexter** é um aplicativo voltado para gestores, secretários e profissionais da área administrativa que precisam de agilidade na gestão de suas rotinas. Através de um Assistente de Inteligência Artificial operado por voz, o Dexter permite que o usuário delegue tarefas, agende compromissos e tire dúvidas sobre suas atividades, minimizando o tempo gasto digitando ou navegando em interfaces complexas.
+[![React Native](https://img.shields.io/badge/React_Native-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://reactnative.dev/)
+[![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
+[![PostgreSQL](https://img.shields.io/badge/Neon_Postgres-316192?style=for-the-badge&logo=postgresql&logoColor=white)](https://neon.tech/)
+[![OpenAI](https://img.shields.io/badge/OpenAI_API-412991?style=for-the-badge&logo=openai&logoColor=white)](https://openai.com/)
+[![UML](https://img.shields.io/badge/PlantUML-000000?style=for-the-badge&logo=uml&logoColor=white)](https://plantuml.com/)
 
-Nosso diferencial é a simulação de uma secretária virtual (Deedee), utilizando a API da **ElevenLabs** para processamento de linguagem natural e feedback em áudio fluido e humano, criando uma experiência ágil e intuitiva, ideal para quem está no trânsito ou sobrecarregado de informações.
+> Repositório oficial da disciplina de **Projeto de Desenvolvimento 1** — *Análise e Desenvolvimento de Sistemas*.
 
-## 👥 A Equipe do Laboratório
-
-O projeto está sendo desenvolvido no âmbito do módulo de Projeto de Desenvolvimento I por:
-
-*   **Dione Pinheiro** - *PO (Product Owner)*: Priorização de backlog e coordenação.
-*   **Ítalo Valente** - *Back-end Developer*: Lógica do servidor e banco de dados.
-*   **Bruno Correa** - *Front-end Developer*: Interface em React Native e UX/UI.
-*   **Lucas Rocha** - *Documentador (Technical Writer)*: Documentação do projeto, arquitetura e versionamento.
-
-## 🎯 Público-Alvo
-
-*   **Gestores (Ex: Roberto, 52 anos):** Buscam comandos práticos (áudio) e aversão a interfaces burocráticas. Precisam de lembretes rápidos para não perder reuniões e negociações.
-*   **Secretários(as) (Ex: Diego, 48 anos):** Necessitam orquestrar calendários, evitar conflitos de agenda e gerenciar o fluxo de informações corporativas de forma metódica.
-*   **Empreendedores (Ex: Mariana, 35 anos):** Buscam automação, centralização de rotinas e clareza visual sobre a disponibilidade de tempo.
-
-## 🚀 Funcionalidades Principais
-
-*   🎙️ **Criação de Tarefas via Comando de Voz:** Fale com o Dexter e ele extrairá a intenção, o título, a data e o horário para agendar automaticamente.
-*   🤖 **Dicas de Execução de Tarefas (IA):** O assistente fornece sugestões inteligentes e passos para resolver atividades complexas.
-*   🎧 **Feedback em Áudio Natural:** Respostas geradas e faladas usando o serviço da ElevenLabs.
-*   📋 **Quadro Kanban / Gestão Manual:** Controle total sobre a visualização, edição, exclusão e status das tarefas de forma manual quando preferir.
-*   📊 **Planos SaaS (Monetização):**
-    *   *Gratuito:* Limite de 6 tarefas/dia, 1 dica para 2 tarefas.
-    *   *Mensal:* 12 tarefas/dia, 1 dica por tarefa.
-    *   *Anual:* Sem limite de tarefas, 3 dicas por tarefa.
-*   🔐 **Segurança e Privacidade:** Dados sensíveis guardados no dispositivo e credenciais criptografadas no banco Neon Postgres.
-
-## 🛠️ Stack Tecnológico
-
-### Front-end
-*   **React Native** - Framework para construção do aplicativo mobile (iOS e Android).
-*   **Figma** - Prototipação e design de interfaces.
-
-### Back-end & Banco de Dados
-*   **Python** - Lógica do servidor e intermediação de requisições.
-*   **Neon Postgres** - Banco de dados relacional em nuvem.
-
-### Inteligência Artificial
-*   **ElevenLabs API** - Processamento de Linguagem Natural (Comandos).
-*   **Faster-Whisper** - Text-to-Speech (Voz da Assistente).
-
-### Ferramentas de Gestão
-*   **Miro** - Organização de ideias, Modelagem de DER e Casos de Uso.
-*   **GitHub / GitLab** - Versionamento de código e documentação.
-
-## 📂 Arquitetura e Modelagem
-
-Os artefatos de modelagem do projeto (como o Modelo Entidade-Relacionamento e os Diagramas de Casos de Uso em PlantUML) estão documentados nas pastas internas do repositório, garantindo rastreabilidade e facilidade de manutenção.
-
-*(Insira aqui links para os diagramas caso estejam em pastas como `/docs`)*
-
-## 🗓️ Cronograma de Execução
-
-1.  **Etapa 1:** Planejamento e Levantamento de Requisitos (✅ Concluído)
-2.  **Etapa 2:** Prototipação no Figma e Modelagem de Dados (DER) (✅ Concluído)
-3.  **Etapa 3:** Desenvolvimento Back-end (Neon) e Front-end (React Native)
-4.  **Etapa 4:** Integração de Agentes de IA e Testes Finais
+</div>
 
 ---
 
-> *"Para focar no que realmente precisa, se organize com Dexter (e sua irmã Deedee)."*
+## 📖 Visão Geral
+
+O **Dexter** é uma aplicação mobile assistiva voltada à produtividade e administração pessoal. Através de **Transcrição de Áudio (Speech-to-Text)** e **Processamento de Linguagem Natural (OpenAI)**, o sistema atua como um copiloto diário: o usuário pode enviar um áudio ou digitar para cadastrar suas tarefas, organizar seu fluxo de trabalho em um quadro **Kanban** interativo e receber um retorno imediato com dicas práticas geradas por Inteligência Artificial sobre como executar cada atividade com mais eficiência.
+
+---
+
+## ✨ Funcionalidades e Escopo do Sistema
+
+### 👤 Gestão de Conta e Autenticação
+- Cadastro, autenticação segura e gerenciamento de perfil do usuário.
+
+### 📋 Gestão Inteligente de Tarefas (Kanban & IA)
+- **Entrada por Voz (Transcrição) ou Texto:** O usuário envia um áudio falando sua pendência; o sistema transcreve automaticamente o conteúdo e estrutura a tarefa (ou permite o cadastro manual via texto).
+- **Retorno de Dicas de Execução via IA:** A partir da tarefa criada ou selecionada, a IA analisa o contexto e retorna dicas práticas e passos acionáveis para auxiliar na sua conclusão.
+- **Quadro Kanban Interativo:** Organização visual e movimentação das tarefas por status (*A Fazer*, *Em Andamento*, *Concluído*).
+- **Edição e Exclusão:** Controle completo sobre prazos, títulos, descrições e prioridades.
+
+---
+
+## 📐 Arquitetura e Modelagem UML
+
+O projeto conta com documentação técnica baseada nos padrões da **UML**, utilizando **PlantUML / Astah** para mapear os requisitos e interações do sistema:
+
+- **Atores Principais:**
+  - **Usuário:** Interage com o aplicativo enviando áudios/textos, gerenciando sua conta, movimentando o quadro Kanban e consultando as dicas da IA.
+- **Sistemas Externos / Atores Secundários:**
+  - **API de IA (OpenAI):** Responsável pela transcrição do áudio enviado pelo usuário (Speech-to-Text), interpretação do comando e geração do retorno em texto com dicas personalizadas para a tarefa.
+- **Artefatos no Repositório:** Os diagramas de Casos de Uso (`.puml` / imagens exportadas) e especificações técnicas encontram-se organizados nos diretórios de documentação do projeto.
+
+---
+
+## 🛠️ Stack Tecnológica
+
+| Camada | Tecnologias Utilizadas |
+| :--- | :--- |
+| **Front-end (Mobile)** | React Native, Expo, JavaScript / TypeScript |
+| **Back-end** | Python, REST API, Integração de Serviços de IA |
+| **Banco de Dados** | Neon Postgres (Serverless PostgreSQL) |
+| **Inteligência Artificial** | OpenAI API (Transcrição de Áudio / Whisper & Geração de Dicas via LLM) |
+| **Documentação & Modelagem** | Markdown, PlantUML, Astah UML |
+| **Controle de Versão** | Git & GitHub |
+
+---
+
+## 👥 Equipe de Desenvolvimento
+
+| Integrante | Função / Papel no Projeto | Responsabilidades Principais |
+| :--- | :--- | :--- |
+| **Dione** | Product Owner (PO) | Visão do produto, levantamento de requisitos e gestão de backlog. |
+| **Ítalo** | Desenvolvedor Back-end | Arquitetura da API em Python, banco de dados Neon e integração de transcrição/IA. |
+| **Bruno** | Desenvolvedor Front-end | Desenvolvimento mobile em React Native, captura de áudio, telas do Kanban e UI/UX. |
+| **Lucas** | Documentador Técnico / Arquitetura | Modelagem de sistemas, Diagramas UML (PlantUML) e documentação técnica do repositório. |
+
+---
+
+## 📂 Estrutura de Diretórios
+
+```plaintext
+Projeto-de-Desenvolvimento-1/
+├── docs/                       # Documentação técnica e artefatos de engenharia de software
+│   ├── uml/                    # Diagramas de Casos de Uso, código PlantUML (.puml) e imagens (.png/.svg)
+│   └── requisitos/             # Escopo, regras de negócio e documentação complementar
+├── backend/                    # Servidor Python, rotas da API, transcrição de áudio e integração IA/Banco
+├── mobile/                     # Aplicação cliente desenvolvida em React Native
+└── README.md                   # Documentação principal do projeto
+
+📊 Status do Projeto (Roadmap)
+[x] Definição do escopo do produto e papéis da equipe
+
+[x] Modelagem e refinamento do Diagrama de Casos de Uso em PlantUML
+
+[x] Estruturação do banco de dados em nuvem (Neon Postgres)
+
+[x] Implementação do fluxo de envio de áudio, transcrição e geração de dicas com IA
+
+[x] Construção do fluxo principal e quadro Kanban no React Native
+
+[X] Testes integrados de ponta a ponta (Front-end ↔ Back-end ↔ IA)
+
+[ ] Apresentação e entrega final da disciplina
