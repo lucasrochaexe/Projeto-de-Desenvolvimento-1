@@ -2,28 +2,13 @@ import { Router, Response } from "express"
 import multer from "multer"
 import { TokenInterface } from "../verificaToken"
 import { conversarComAgente, encerrarSessao, extrairTarefa } from "../../services/elevenlabs"
+import { transcreverAudio } from "../../services/groq"
 
 const router = Router()
 const upload = multer({
     storage: multer.memoryStorage(),
     limits: { fileSize: 10 * 1024 * 1024 }
 })
-
-async function transcreverAudio(audio: Express.Multer.File): Promise<string> {
-    const form = new FormData()
-    const audioBuffer = new ArrayBuffer(audio.buffer.byteLength)
-    new Uint8Array(audioBuffer).set(audio.buffer)
-    form.append("arquivo", new Blob([audioBuffer], { type: audio.mimetype }), audio.originalname)
-
-    const resposta = await fetch(`${process.env.TRANSCRITOR_URL}/transcrever`, {
-        method: "POST",
-        body: form
-    })
-    if (!resposta.ok) throw new Error("Falha na transcrição")
-
-    const { texto } = await resposta.json()
-    return texto
-}
 
 async function processarTexto(usuarioId: string, texto: string) {
     const resposta = await conversarComAgente(usuarioId, texto)
