@@ -64,10 +64,10 @@ O projeto conta com documentação técnica baseada nos padrões da **UML**, uti
 
 | Integrante | Função / Papel no Projeto | Responsabilidades Principais |
 | :--- | :--- | :--- |
-| **Dione** | Product Owner (PO) | Visão do produto, levantamento de requisitos e gestão de backlog. |
-| **Ítalo** | Desenvolvedor Back-end | Arquitetura da API em Python, banco de dados Neon e integração de transcrição/IA. |
-| **Bruno** | Desenvolvedor Front-end | Desenvolvimento mobile em React Native, captura de áudio, telas do Kanban e UI/UX. |
-| **Lucas** | Documentador Técnico / Arquitetura | Modelagem de sistemas, Diagramas UML (PlantUML) e documentação técnica do repositório. |
+| [**Dione**](https://github.com/Dione6030) | Product Owner (PO) | Visão do produto, levantamento de requisitos e gestão de backlog. |
+| [**Ítalo**](https://github.com/istalo) | Desenvolvedor Back-end | Arquitetura da API em Python, banco de dados Neon e integração de transcrição/IA. |
+| [**Bruno**](https://github.com/BrunoPCdS) | Desenvolvedor Front-end | Desenvolvimento mobile em React Native, captura de áudio, telas do Kanban e UI/UX. |
+| [**Lucas**](https://github.com/lucasrochaexe) | Documentador Técnico / Arquitetura | Modelagem de sistemas, Diagramas UML (PlantUML) e documentação técnica do repositório. |
 
 ---
 
