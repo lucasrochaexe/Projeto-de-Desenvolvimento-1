@@ -24,7 +24,13 @@
     "plugins": [
       "@react-native-community/datetimepicker",
       "expo-secure-store",
-      ["expo-audio", {"microphonePermission": "Permitir que o aplicativo acesse o microfone para gravar áudio."}]
+      [
+        "expo-audio",
+        {
+          "microphonePermission": "Permitir que o aplicativo acesse o microfone para gravar áudio."
+        }
+      ],
+      "expo-status-bar"
     ]
   }
 }
