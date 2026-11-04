@@ -56,7 +56,7 @@ cron.schedule('0 0 * * *', async () => {
 })
 
 // Notificações para tarefas que vencem nos próximos 15 dias ou já estão atrasadas. ajustar projeto final 0 0 * * *
-cron.schedule('*/5 * * * *', async () => {
+cron.schedule('0 0 * * *', async () => {
   console.log("Iniciando verificação de prazos para notificações...")
   const agora = new Date()
 
