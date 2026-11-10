@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, type ComponentRef } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { MensagemChat } from './useAgent';
 
@@ -13,7 +13,7 @@ export function ChatMensagens({
     digitando = false,
     espacoInferior = 0,
 }: ChatMensagensProps) {
-    const scrollRef = useRef<ScrollView>(null);
+    const scrollRef = useRef<ComponentRef<typeof ScrollView>>(null);
 
     return (
         <ScrollView

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "905458976873",
+    "project_id": "dexter-24115",
+    "storage_bucket": "dexter-24115.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:905458976873:android:e7a61df3e62a1854ff3af8",
+        "android_client_info": {
+          "package_name": "com.brunocorreas.Dexter"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDqkcTFi_TC2xpy_k38Cwph_XGPB8aeuUc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

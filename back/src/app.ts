@@ -9,6 +9,8 @@ import routesTarefas from './routes/tarefas'
 import routesNotificacoes from './routes/notificacoes'
 import routesAutorizacao from './routes/auth/login'
 import routesAgentChat from './routes/agent/chat'
+import routesPushTokens from './routes/pushTokens'
+import { enviarPushParaUsuario } from './services/pushNotifications'
 
 //Middleware
 import { verificaToken } from './routes/verificaToken'
@@ -33,6 +35,7 @@ app.use("/auth", routesAutorizacao)
 app.use(verificaToken)
 app.use("/tarefas", routesTarefas)
 app.use("/notificacoes", routesNotificacoes)
+app.use("/push-tokens", routesPushTokens)
 app.use("/agent-chat", routesAgentChat)
 
 // Lixeira (caso tarefas não sejam excluídas manualmente)
@@ -97,6 +100,16 @@ cron.schedule('0 0 * * *', async () => {
         })
       )
     )
+    for (const tarefa of tarefasVencendo) {
+      await enviarPushParaUsuario(
+        tarefa.usuarioId,
+        'Tarefa próxima do prazo',
+        `A tarefa "${tarefa.titulo}" está próxima do prazo.`,
+        {
+          tarefaId: tarefa.id,
+        },
+      );
+    }
 
     console.log(`${notificacoesCriadas.length} alertas gerados para tarefas próximas do prazo.`)
   } catch (error) {

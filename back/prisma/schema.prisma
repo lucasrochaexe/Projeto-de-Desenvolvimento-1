@@ -20,6 +20,7 @@ model Usuario {
   tarefas      Tarefa[]
   tokens       Token[]
   logs         Log[]
+  pushToken    PushToken[]
 
   @@map("usuarios")
 }
@@ -55,6 +56,19 @@ model Notificacao {
   logs       Log[]
 
   @@map("notificacoes")
+}
+
+model PushToken {
+  id          String   @id @default(cuid())
+  usuarioId   String
+  token       String   @unique
+  plataforma  String
+  ativo       Boolean  @default(true)
+  criadoEm    DateTime @default(now())
+  atualizadoEm DateTime @updatedAt
+  usuario     Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@map("push_tokens")
 }
 
 model Token {

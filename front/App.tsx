@@ -7,6 +7,11 @@ import { Cadastrar } from './src/screens/Cadastrar';
 import { SobreDexter } from './src/screens/SobreDexter';
 import { MenuScreen } from './src/screens/MenuScreen';
 import { RecuperarSenha } from './src/screens/RecuperarSenha';
+import {
+  configurarToqueNaNotificacao,
+  obterExpoPushToken,
+} from './src/services/notifications';
+import { registrarPushToken } from './src/services/api';
 
 
 
@@ -24,7 +29,13 @@ export default function App() {
   const [showRegister, setShowRegister] = useState(false);
   const [showAbout, setShowAbout] = useState(false);
   const [showRecoverPassword, setShowRecoverPassword] = useState(false);
+  const [tarefaNotificadaId, setTarefaNotificadaId] = useState<string | null>(null);
   const rotacao = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    return configurarToqueNaNotificacao(setTarefaNotificadaId);
+  }, []);
+
   useEffect(() => {
     const animacaoOrbita = Animated.loop(
       Animated.timing(rotacao, {
@@ -64,7 +75,8 @@ if (showRegister) {
       }}
     />
   );
-}
+  }
+
 
 if (showAbout) {
   return (
@@ -85,9 +97,16 @@ if (showRecoverPassword) {
 
 return (
   <LoginScreen
-    onLogin={(novoToken) => {
+    onLogin={async (novoToken) => {
       setToken(novoToken);
       setIsLoggedIn(true);
+
+      try {
+        const expoPushToken = await obterExpoPushToken();
+        await registrarPushToken(novoToken, expoPushToken);
+      } catch (error) {
+        console.error('Erro ao registrar notificações push:', error);
+      }
     }}
     onRegister={() => setShowAbout(true)}
     onRecoverPassword={() => setShowRecoverPassword(true)}
@@ -98,9 +117,11 @@ return (
     return (
       <MenuScreen
         token={token}
+        tarefaNotificadaId={tarefaNotificadaId}
         onLogout={() => {
           setToken(null);
           setIsLoggedIn(false);
+          setTarefaNotificadaId(null);
         }}
       />
     );
@@ -153,4 +174,3 @@ return (
     </View>
   );
 }
-

@@ -45,13 +45,23 @@ type OuvirScreenProps = {
 
 type MenuScreenProps = {
   token: string | null;
+  tarefaNotificadaId?: string | null;
   onLogout: () => void;
 };
 
-export function MenuScreen({ token, onLogout }: MenuScreenProps) {
+export function MenuScreen({ token, tarefaNotificadaId, onLogout }: MenuScreenProps) {
   const [selectedScreen, setSelectedScreen] = useState('');
   const [selectedAgendaId, setSelectedAgendaId] = useState<string | null>(null);
   const [notificationCount, setNotificationCount] = useState(0);
+
+  useEffect(() => {
+    if (!tarefaNotificadaId) {
+      return;
+    }
+
+    setSelectedAgendaId(tarefaNotificadaId);
+    setSelectedScreen('Agenda');
+  }, [tarefaNotificadaId]);
 
   useEffect(() => {
     if (!token || selectedScreen !== '') {

@@ -10,13 +10,21 @@
       "supportsTablet": true
     },
     "android": {
+        "package": "com.brunocorreas.Dexter",
+        "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
         "backgroundColor": "#000000",
         "foregroundImage": "./assets/logoEscuro.png",
         "backgroundImage": "./assets/fundo.png",
         "monochromeImage": "./assets/logoBranco.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS",
+        "android.permission.FOREGROUND_SERVICE",
+        "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"
+      ],
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -24,6 +32,7 @@
     "plugins": [
       "@react-native-community/datetimepicker",
       "expo-secure-store",
+      "expo-notifications",
       [
         "expo-audio",
         {
@@ -31,6 +40,12 @@
         }
       ],
       "expo-status-bar"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "01cbb433-4357-4b2a-b444-b80b5f7e07e9"
+      }
+    },
+    "owner": "brunocorreas"
   }
 }

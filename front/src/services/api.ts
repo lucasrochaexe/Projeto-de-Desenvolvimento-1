@@ -25,7 +25,7 @@ export async function apiRequest(path: string, options: ApiOptions = {}) {
 
     const data = await response.json();
     if (!response.ok) {
-      throw new Error(data.erro || "Erro na comunicação com o servidor");
+      throw new Error(data.erro || "Erro na comunicaï¿½ï¿½o com o servidor");
     }
     return data;
   } catch (error) {
@@ -242,5 +242,19 @@ export async function limparNotificacoes(token: string) {
   return apiRequest("/notificacoes", {
     method: "DELETE",
     token,
+  });
+}
+
+export async function registrarPushToken(
+  token: string,
+  expoPushToken: string,
+) {
+  return apiRequest('/push-tokens', {
+    method: 'POST',
+    token,
+    body: JSON.stringify({
+      token: expoPushToken,
+      plataforma: 'expo',
+    }),
   });
 }
