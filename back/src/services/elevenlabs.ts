@@ -135,8 +135,8 @@ export function extrairRascunho(resposta: string): { mensagem: string; tarefa: R
     if (!limpo.startsWith("{")) return null
     try {
         const json = JSON.parse(limpo)
-        if (json.titulo) return json
-        return json.tarefa?.titulo ? json.tarefa : null
+        if (!json.tarefa?.titulo) return null
+        return { mensagem: String(json.mensagem ?? ""), tarefa: json.tarefa }
     } catch {
         return null
     }
