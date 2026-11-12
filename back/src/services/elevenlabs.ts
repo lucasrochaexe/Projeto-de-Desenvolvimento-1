@@ -135,7 +135,21 @@ export function extrairTarefa(resposta: string): Record<string, unknown> | null 
     if (!limpo.startsWith("{")) return null
     try {
         const json = JSON.parse(limpo)
-        return json.titulo ? json : null
+        if (json.titulo) return json
+        return json.tarefa?.titulo ? json.tarefa : null
+    } catch {
+        return null
+    }
+}
+
+export function extrairMensagem(resposta: string): string | null {
+    const limpo = resposta.replace(/```json|```/g, "").trim()
+    if (!limpo.startsWith("{")) return null
+
+    try {
+        const json = JSON.parse(limpo)
+        const mensagem = json.mensagem || json.texto
+        return typeof mensagem === "string" ? mensagem : null
     } catch {
         return null
     }

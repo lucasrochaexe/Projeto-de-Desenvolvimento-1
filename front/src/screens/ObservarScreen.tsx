@@ -13,8 +13,14 @@ type ObservarScreenProps = {
 };
 
 export function ObservarScreen({ onBack, token }: ObservarScreenProps) {
-  const [text, setText] = useState('');
-  const { mensagens, enviando, enviarTexto } = useAgente(token);
+    const [text, setText] = useState('');
+    const {
+    mensagens,
+    enviando,
+    enviarTexto,
+    tarefaPendente,
+    confirmarTarefa,
+  } = useAgente(token);
 
   const handleSend = () => {
     if (text.trim() === '' || enviando) return;
@@ -32,11 +38,13 @@ export function ObservarScreen({ onBack, token }: ObservarScreenProps) {
         <MenuBar onBack={onBack} title="Escrever" />
 
         <View style={screenStyles.areaMensagens}>
-          <ChatMensagens
-            mensagens={mensagens}
-            digitando={enviando}
-            espacoInferior={180}
-          />
+        <ChatMensagens
+          mensagens={mensagens}
+          digitando={enviando}
+          espacoInferior={180}
+          mostrarConfirmar={tarefaPendente !== null}
+          onConfirmar={confirmarTarefa}
+        />
         </View>
 
         <View style={screenStyles.messageContainer}>

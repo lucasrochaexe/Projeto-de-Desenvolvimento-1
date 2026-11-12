@@ -1,17 +1,21 @@
 import { useRef, type ComponentRef } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { MensagemChat } from './useAgent';
 
 type ChatMensagensProps = {
     mensagens: MensagemChat[];
     digitando?: boolean;
     espacoInferior?: number;
+    mostrarConfirmar?: boolean;
+    onConfirmar?: () => void;
 };
 
 export function ChatMensagens({
     mensagens,
     digitando = false,
     espacoInferior = 0,
+    mostrarConfirmar = false,
+    onConfirmar,
 }: ChatMensagensProps) {
     const scrollRef = useRef<ComponentRef<typeof ScrollView>>(null);
 
@@ -45,6 +49,16 @@ export function ChatMensagens({
                 );
             })}
 
+            {mostrarConfirmar && onConfirmar && (
+                <Pressable
+                    disabled={digitando}
+                    onPress={onConfirmar}
+                    style={[styles.botaoConfirmar, digitando && styles.botaoDesabilitado]}
+                >
+                    <Text style={styles.textoConfirmar}>Confirmar</Text>
+                </Pressable>
+            )}
+
             {digitando && (
                 <View style={[styles.bolha, styles.bolhaAgente]}>
                     <Text style={styles.textoAgente}>Dexter está pensando...</Text>
@@ -76,5 +90,21 @@ const styles = StyleSheet.create({
     textoAgente: {
         color: '#27231F',
         fontSize: 16,
+    },
+    botaoConfirmar: {
+        alignSelf: 'flex-start',
+        backgroundColor: '#D5A23A',
+        borderRadius: 12,
+        marginVertical: 8,
+        paddingHorizontal: 20,
+        paddingVertical: 10,
+    },
+    botaoDesabilitado: {
+        opacity: 0.5,
+    },
+    textoConfirmar: {
+        color: '#2B2520',
+        fontSize: 16,
+        fontWeight: 'bold',
     },
 });

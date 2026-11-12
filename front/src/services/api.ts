@@ -137,7 +137,12 @@ export type TarefaDoAgente = {
 // "transcricao" só vem na rota de áudio.
 export type RespostaAgente =
   | { tipo: "mensagem"; texto: string; transcricao?: string }
-  | { tipo: "tarefa"; tarefa: TarefaDoAgente; transcricao?: string };
+  | {
+      tipo: "tarefa";
+      tarefa: TarefaDoAgente;
+      texto: string;
+      transcricao?: string;
+    };
 
 export async function enviarMensagemAoAgente(
   token: string,

@@ -32,7 +32,13 @@ export function OuvirScreen({ onBack, token }: OuvirScreenProps) {
   const gravandoRef = useRef(false);
 
   const [estado, setEstado] = useState<Estado>("parado");
-  const { mensagens, enviando, enviarAudio } = useAgente(token);
+  const {
+  mensagens,
+  enviando,
+  enviarAudio,
+  tarefaPendente,
+  confirmarTarefa,
+  } = useAgente(token);
 
   async function pedirPermissao() {
     const { granted } = await AudioModule.requestRecordingPermissionsAsync();
@@ -116,6 +122,8 @@ export function OuvirScreen({ onBack, token }: OuvirScreenProps) {
           mensagens={mensagens}
           digitando={enviando}
           espacoInferior={190}
+          mostrarConfirmar={tarefaPendente !== null}
+          onConfirmar={confirmarTarefa}
         />
       </View>
       <Text style={styles.legenda}>{legenda}</Text>

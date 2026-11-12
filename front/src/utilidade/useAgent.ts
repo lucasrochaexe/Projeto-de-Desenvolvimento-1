@@ -5,6 +5,7 @@ import {
     enviarMensagemAoAgente,
     reiniciarConversaComAgente,
     RespostaAgente,
+    TarefaDoAgente,
     salvarTarefaDoAgente,
 } from '../services/api';
 
@@ -21,6 +22,8 @@ export type MensagemChat = {
 export function useAgente(token: string | null) {
     const [mensagens, setMensagens] = useState<MensagemChat[]>([]);
     const [enviando, setEnviando] = useState(false);
+    const [tarefaPendente, setTarefaPendente] =
+    useState<TarefaDoAgente | null>(null);
     const ocupadoRef = useRef(false);
     const proximoIdRef = useRef(0);
     const tokenRef = useRef(token);
@@ -63,11 +66,8 @@ export function useAgente(token: string | null) {
                 }
 
                 if (resposta.tipo === 'tarefa') {
-                    await salvarTarefaDoAgente(tokenAtual, resposta.tarefa);
-                    adicionar(
-                        'agente',
-                        `Pronto! A tarefa "${resposta.tarefa.titulo}" foi salva na sua agenda.`
-                    );
+                    setTarefaPendente(resposta.tarefa);
+                    adicionar('agente', resposta.texto);
                 } else {
                     adicionar('agente', resposta.texto);
                 }
@@ -85,6 +85,40 @@ export function useAgente(token: string | null) {
         },
         [adicionar]
     );
+        /**
+         * Confirma a tarefa pendente e a salva no servidor.
+         */
+        const confirmarTarefa = useCallback(async () => {
+        const tokenAtual = tokenRef.current;
+
+        if (!tokenAtual || !tarefaPendente || ocupadoRef.current) {
+            return;
+        }
+
+        ocupadoRef.current = true;
+        setEnviando(true);
+
+        try {
+            await salvarTarefaDoAgente(tokenAtual, tarefaPendente);
+
+            adicionar(
+                'agente',
+                `Pronto! A tarefa "${tarefaPendente.titulo}" foi salva na sua agenda. Deseja fazer uma nova solicitação?`
+            );
+
+            setTarefaPendente(null);
+        } catch (erro) {
+            Alert.alert(
+                'Erro',
+                erro instanceof Error
+                    ? erro.message
+                    : 'Não foi possível salvar a tarefa.'
+            );
+        } finally {
+            ocupadoRef.current = false;
+            setEnviando(false);
+        }
+        }, [adicionar, tarefaPendente]);
 
     const enviarTexto = useCallback(
         async (texto: string) => {
@@ -113,5 +147,12 @@ export function useAgente(token: string | null) {
         [processar]
     );
 
-    return { mensagens, enviando, enviarTexto, enviarAudio };
+    return {
+    mensagens,
+    enviando,
+    enviarTexto,
+    enviarAudio,
+    tarefaPendente,
+    confirmarTarefa,
+    };
 }

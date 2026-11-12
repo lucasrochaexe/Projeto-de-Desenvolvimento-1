@@ -1,7 +1,12 @@
 import { Router, Response } from "express"
 import multer from "multer"
 import { TokenInterface } from "../verificaToken"
-import { conversarComAgente, encerrarSessao, extrairTarefa } from "../../services/elevenlabs"
+import {
+    conversarComAgente,
+    encerrarSessao,
+    extrairMensagem,
+    extrairTarefa
+} from "../../services/elevenlabs"
 import { transcreverAudio } from "../../services/groq"
 
 const router = Router()
@@ -16,7 +21,11 @@ async function processarTexto(usuarioId: string, texto: string) {
 
     if (tarefa) {
         encerrarSessao(usuarioId)
-        return { tipo: "tarefa", tarefa }
+        return {
+            tipo: "tarefa",
+            texto: extrairMensagem(resposta) || "Deseja confirmar esta tarefa?",
+            tarefa
+        }
     }
     return { tipo: "mensagem", texto: resposta }
 }
