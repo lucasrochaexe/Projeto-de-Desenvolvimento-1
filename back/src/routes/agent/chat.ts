@@ -5,7 +5,7 @@ import {
     conversarComAgente,
     encerrarSessao,
     extrairMensagem,
-    extrairTarefa
+    extrairRascunho
 } from "../../services/elevenlabs"
 import { transcreverAudio } from "../../services/groq"
 
@@ -17,15 +17,10 @@ const upload = multer({
 
 async function processarTexto(usuarioId: string, texto: string) {
     const resposta = await conversarComAgente(usuarioId, texto)
-    const tarefa = extrairTarefa(resposta)
+    const rascunho = extrairRascunho(resposta)
 
-    if (tarefa) {
-        encerrarSessao(usuarioId)
-        return {
-            tipo: "tarefa",
-            texto: extrairMensagem(resposta) || "Deseja confirmar esta tarefa?",
-            tarefa
-        }
+    if (rascunho) {
+        return { tipo: "tarefa", texto: rascunho.mensagem, tarefa: rascunho.tarefa }
     }
     return { tipo: "mensagem", texto: resposta }
 }
