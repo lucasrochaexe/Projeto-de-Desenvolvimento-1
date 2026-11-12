@@ -5,8 +5,9 @@
       "distribution": "internal"
     },
     "preview": {
-      "distribution": "internal"
+      "distribution": "internal",
+      "environment": "preview"
     },
-    "production": {}
+    "production": {"environment": "production"}
   }
 }
