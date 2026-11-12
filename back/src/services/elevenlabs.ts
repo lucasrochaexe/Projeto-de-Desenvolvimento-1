@@ -130,7 +130,7 @@ export async function conversarComAgente(usuarioId: string, texto: string): Prom
     return resposta
 }
 
-export function extrairTarefa(resposta: string): Record<string, unknown> | null {
+export function extrairRascunho(resposta: string): { mensagem: string; tarefa: Record<string, unknown> } | null {
     const limpo = resposta.replace(/```json|```/g, "").trim()
     if (!limpo.startsWith("{")) return null
     try {
