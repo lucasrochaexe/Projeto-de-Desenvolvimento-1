@@ -24,7 +24,7 @@
         "android.permission.MODIFY_AUDIO_SETTINGS",
         "android.permission.FOREGROUND_SERVICE",
         "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"
-      ],
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -36,6 +36,7 @@
       [
         "expo-audio",
         {
+          "sounds": ["./src/utilidade/sound/bip.mp3"],
           "microphonePermission": "Permitir que o aplicativo acesse o microfone para gravar áudio."
         }
       ],

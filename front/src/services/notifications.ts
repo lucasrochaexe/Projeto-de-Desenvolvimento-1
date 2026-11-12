@@ -35,7 +35,7 @@ export async function obterExpoPushToken() {
             name: 'Tarefas',
             importance: Notifications.AndroidImportance.HIGH,
             vibrationPattern: [0, 250, 250, 250],
-            sound: 'default',
+            sound: 'bip.mp3',
         });
     }
 
