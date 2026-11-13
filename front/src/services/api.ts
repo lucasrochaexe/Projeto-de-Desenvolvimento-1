@@ -23,7 +23,16 @@ export async function apiRequest(path: string, options: ApiOptions = {}) {
       },
     });
 
-    const data = await response.json();
+    const responseText = await response.text();
+    let data;
+    try {
+      data = responseText ? JSON.parse(responseText) : {};
+    } catch {
+      throw new Error(
+        `A API retornou uma resposta inválida (HTTP ${response.status}). Verifique EXPO_PUBLIC_API_URL.`,
+      );
+    }
+
     if (!response.ok) {
       throw new Error(data.erro || "Erro na comunica��o com o servidor");
     }

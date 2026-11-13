@@ -22,7 +22,7 @@ async function processarTexto(usuarioId: string, texto: string) {
     if (rascunho) {
         return { tipo: "tarefa", texto: rascunho.mensagem, tarefa: rascunho.tarefa }
     }
-    return { tipo: "mensagem", texto: resposta }
+    return { tipo: "mensagem", texto: extrairMensagem(resposta) ?? resposta }
 }
 
 router.post("/mensagem", async (req: TokenInterface, res: Response) => {

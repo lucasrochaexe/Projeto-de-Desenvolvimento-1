@@ -30,8 +30,10 @@ export async function obterExpoPushToken() {
         throw new Error('Permissão para receber notificações não concedida.');
     }
 
-    if (Platform.OS === 'android') {
-        await Notifications.setNotificationChannelAsync('tarefas', {
+    const isExpoGo = Constants.appOwnership === 'expo';
+
+    if (Platform.OS === 'android' && !isExpoGo) {
+        await Notifications.setNotificationChannelAsync('tarefas-v2', {
             name: 'Tarefas',
             importance: Notifications.AndroidImportance.HIGH,
             vibrationPattern: [0, 250, 250, 250],

@@ -130,27 +130,39 @@ export async function conversarComAgente(usuarioId: string, texto: string): Prom
     return resposta
 }
 
-export function extrairRascunho(resposta: string): { mensagem: string; tarefa: Record<string, unknown> } | null {
-    const limpo = resposta.replace(/```json|```/g, "").trim()
-    if (!limpo.startsWith("{")) return null
+function extrairObjetoJson(resposta: string): Record<string, unknown> | null {
+    const inicio = resposta.indexOf("{")
+    const fim = resposta.lastIndexOf("}")
+
+    if (inicio < 0 || fim <= inicio) return null
+
     try {
-        const json = JSON.parse(limpo)
-        if (!json.tarefa?.titulo) return null
-        return { mensagem: String(json.mensagem ?? ""), tarefa: json.tarefa }
+        const objeto: unknown = JSON.parse(resposta.slice(inicio, fim + 1))
+        return objeto && typeof objeto === "object"
+            ? objeto as Record<string, unknown>
+            : null
     } catch {
         return null
     }
 }
 
-export function extrairMensagem(resposta: string): string | null {
-    const limpo = resposta.replace(/```json|```/g, "").trim()
-    if (!limpo.startsWith("{")) return null
+export function extrairRascunho(resposta: string): { mensagem: string; tarefa: Record<string, unknown> } | null {
+    const json = extrairObjetoJson(resposta)
+    const tarefa = json?.tarefa
 
-    try {
-        const json = JSON.parse(limpo)
-        const mensagem = json.mensagem || json.texto
-        return typeof mensagem === "string" ? mensagem : null
-    } catch {
-        return null
+    if (!tarefa || typeof tarefa !== "object") return null
+
+    const titulo = (tarefa as Record<string, unknown>).titulo
+    if (typeof titulo !== "string" || !titulo.trim()) return null
+
+    return {
+        mensagem: typeof json.mensagem === "string" ? json.mensagem : "",
+        tarefa: tarefa as Record<string, unknown>,
     }
+}
+
+export function extrairMensagem(resposta: string): string | null {
+    const json = extrairObjetoJson(resposta)
+    const mensagem = json?.mensagem ?? json?.texto
+    return typeof mensagem === "string" ? mensagem : null
 }

@@ -24,7 +24,7 @@ export async function enviarPushParaUsuario(
       title: titulo,
       body: mensagem,
       data,
-      channelId: 'tarefas',
+      channelId: 'tarefas-v2',
     }));
 
   if (mensagens.length === 0) {
