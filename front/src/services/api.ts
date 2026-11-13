@@ -263,3 +263,22 @@ export async function registrarPushToken(
     }),
   });
 }
+
+export async function registrarErroNoServidor(
+  token: string,
+  erro: {
+    mensagem: string;
+    onde: string;
+    stack?: string;
+  },
+) {
+  return apiRequest("/logs/client", {
+    method: "POST",
+    token,
+    body: JSON.stringify({
+      erro: erro.mensagem,
+      onde: erro.onde,
+      stack: erro.stack,
+    }),
+  });
+}

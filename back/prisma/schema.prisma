@@ -93,7 +93,19 @@ model Log {
   tarefa        Tarefa?      @relation(fields: [tarefaId], references: [id], onDelete: Cascade)
   notificacao   Notificacao? @relation(fields: [notificacaoId], references: [id], onDelete: Cascade)
   usuario       Usuario?     @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
-
+  
+  // Campos adicionais para armazenar informações do log erro dos usuarios
+  usuarioNome    String?
+  erro           String?
+  onde           String
+  sessao         String?
+  nivel          String      @default("error")
+  stack          String?
+  rota           String?
+  metodo         String?
+    
+  @@index([criadoEm])
+  @@index([usuarioId])
   @@map("logs")
 }
 

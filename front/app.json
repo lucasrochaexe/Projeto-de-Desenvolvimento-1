@@ -1,10 +1,5 @@
 {
   "expo": {
-    "splash": {
-      "image": "./src/img/oppen.jpg",
-      "resizeMode": "cover",
-      "backgroundColor": "#111111"
-    },
     "name": "Dexter",
     "slug": "Dexter",
     "version": "1.0.0",
@@ -20,7 +15,6 @@
       "adaptiveIcon": {
         "backgroundColor": "#000000",
         "foregroundImage": "./assets/logoEscuro.png",
-        "backgroundImage": "./assets/fundo.png",
         "monochromeImage": "./assets/logoBranco.png"
       },
       "predictiveBackGestureEnabled": false,
@@ -37,7 +31,20 @@
     "plugins": [
       "@react-native-community/datetimepicker",
       "expo-secure-store",
-      "expo-notifications",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./src/img/oppen.jpg",
+          "resizeMode": "cover",
+          "backgroundColor": "#111111"
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "sounds": ["./src/utilidade/sound/bip.mp3"]
+        }
+      ],
       [
         "expo-audio",
         {

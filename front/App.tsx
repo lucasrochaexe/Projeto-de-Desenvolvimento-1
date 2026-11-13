@@ -11,7 +11,7 @@ import {
   configurarToqueNaNotificacao,
   obterExpoPushToken,
 } from './src/services/notifications';
-import { registrarPushToken } from './src/services/api';
+import { registrarErroNoServidor, registrarPushToken } from './src/services/api';
 
 
 
@@ -106,6 +106,18 @@ return (
         await registrarPushToken(novoToken, expoPushToken);
       } catch (error) {
         console.error('Erro ao registrar notificações push:', error);
+
+        try {
+          await registrarErroNoServidor(novoToken, {
+            mensagem: error instanceof Error
+              ? error.message
+              : String(error),
+            onde: 'front/App.tsx:108 - registro de notificações push',
+            stack: error instanceof Error ? error.stack : undefined,
+          });
+        } catch (erroAoRegistrar) {
+          console.error('Erro ao salvar histórico do erro:', erroAoRegistrar);
+        }
       }
     }}
     onRegister={() => setShowAbout(true)}

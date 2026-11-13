@@ -10,7 +10,12 @@ import routesNotificacoes from './routes/notificacoes'
 import routesAutorizacao from './routes/auth/login'
 import routesAgentChat from './routes/agent/chat'
 import routesPushTokens from './routes/pushTokens'
+import routesLogs from './routes/logs'
 import { enviarPushParaUsuario } from './services/pushNotifications'
+import { logger, registrarErro } from './services/logger'
+import { TokenInterface } from './routes/verificaToken'
+
+import pinoHttp from 'pino-http';
 
 //Middleware
 import { verificaToken } from './routes/verificaToken'
@@ -21,6 +26,29 @@ const port = 3000
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 app.use(cors())
+app.use(pinoHttp({ logger }))
+
+const respostasComErroRegistrado = new WeakSet<express.Response>()
+
+app.use((req, res, next) => {
+  res.on('finish', () => {
+    if (res.statusCode < 500 || respostasComErroRegistrado.has(res)) {
+      return
+    }
+
+    const request = req as TokenInterface
+    void registrarErro({
+      usuarioId: request.usuarioId,
+      erro: `Resposta HTTP ${res.statusCode}`,
+      onde: "resposta de erro da API",
+      sessao: String(req.id),
+      rota: req.originalUrl,
+      metodo: req.method,
+    })
+  })
+
+  next()
+})
 
 app.get('/', (req, res) => {
   res.send('API Backend: Dexter')
@@ -37,6 +65,7 @@ app.use("/tarefas", routesTarefas)
 app.use("/notificacoes", routesNotificacoes)
 app.use("/push-tokens", routesPushTokens)
 app.use("/agent-chat", routesAgentChat)
+app.use("/logs", routesLogs)
 
 // Lixeira (caso tarefas não sejam excluídas manualmente)
 cron.schedule('0 0 * * *', async () => {
@@ -54,7 +83,12 @@ cron.schedule('0 0 * * *', async () => {
     })
     console.log(`${apagadas.count} tarefas antigas foram removidas definitivamente.`)
   } catch (error) {
-    console.error("Erro ao limpar a lixeira:", error)
+    await registrarErro({
+      erro: error instanceof Error ? error.message : String(error),
+      onde: "limpeza automática da lixeira",
+      sessao: "cron-lixeira",
+      stack: error instanceof Error ? error.stack : undefined,
+    })
   }
 })
 
@@ -113,7 +147,12 @@ cron.schedule('0 0 * * *', async () => {
 
     console.log(`${notificacoesCriadas.length} alertas gerados para tarefas próximas do prazo.`)
   } catch (error) {
-    console.error("Erro ao gerar notificações diárias:", error)
+    await registrarErro({
+      erro: error instanceof Error ? error.message : String(error),
+      onde: "geração automática de notificações",
+      sessao: "cron-notificacoes",
+      stack: error instanceof Error ? error.stack : undefined,
+    })
   }
 })
 
@@ -135,7 +174,29 @@ cron.schedule('*/5 * * * *', async () => {
       console.log(`${atualizadas.count} tarefa(s) marcada(s) como atrasada(s).`)
     }
   } catch (error) {
-    console.error("Erro ao atualizar tarefas atrasadas:", error)
+    await registrarErro({
+      erro: error instanceof Error ? error.message : String(error),
+      onde: "atualização automática de tarefas atrasadas",
+      sessao: "cron-tarefas-atrasadas",
+      stack: error instanceof Error ? error.stack : undefined,
+    })
+  }
+})
+
+app.use(async (error: unknown, req: express.Request, res: express.Response, _next: express.NextFunction) => {
+  respostasComErroRegistrado.add(res)
+
+  await registrarErro({
+    erro: error instanceof Error ? error.message : String(error),
+    onde: "middleware global de erros",
+    sessao: String(req.id),
+    stack: error instanceof Error ? error.stack : undefined,
+    rota: req.originalUrl,
+    metodo: req.method,
+  })
+
+  if (!res.headersSent) {
+    res.status(500).json({ erro: "Erro interno do servidor." })
   }
 })
 
