@@ -1,24 +1,11 @@
 import { prisma } from "../../../lib/prisma"
 import { Router } from "express"
+import { enviarEmail } from "../../services/email"
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
 import crypto from "crypto"
-import nodemailer from "nodemailer"
 
 const router = Router()
-const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST || "sandbox.smtp.mailtrap.io",
-    port: Number(process.env.SMTP_PORT || 587),
-    secure: process.env.SMTP_SECURE === "true",
-    requireTLS: process.env.SMTP_REQUIRE_TLS !== "false",
-    connectionTimeout: 10000,
-    greetingTimeout: 10000,
-    socketTimeout: 15000,
-    auth: {
-        user: process.env.SMTP_USER || process.env.MAILTRAP_EMAIL,
-        pass: process.env.SMTP_PASSWORD || process.env.MAILTRAP_SENHA,
-    },
-})
 
 function paginaRedefinicao(mensagem: string, sucesso = false) {
     return `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width">
@@ -78,8 +65,7 @@ router.post("/recuperar-senha", async (req, res) => {
             const apiPublica = process.env.API_PUBLIC_URL || "http://localhost:3000"
             const link = `${apiPublica}/auth/redefinir-senha?token=${token}`
             const logoUrl = process.env.EMAIL_LOGO_URL || `${apiPublica}/auth/logo.svg`
-            const resultado = await transporter.sendMail({
-                from: '"Dexter App" <support@dexterapp.com>',
+            const resultado = await enviarEmail({
                 to: email,
                 subject: "Redefina sua senha | Dexter",
                 text: `Olá ${usuario.nome},\n\nClique no link para criar uma nova senha: ${link}\n\nO link expira em 15 minutos.`,
