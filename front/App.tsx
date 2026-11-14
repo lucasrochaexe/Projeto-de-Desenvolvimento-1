@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { useEffect, useRef, useState } from 'react';
+import { use, useEffect, useRef, useState } from 'react';
 import { Animated, Easing, Image, Text, View } from 'react-native';
 import { styles } from './src/style';
 import { LoginScreen } from './src/screens/LoginScreen';
@@ -11,8 +11,13 @@ import {
   configurarToqueNaNotificacao,
   obterExpoPushToken,
 } from './src/services/notifications';
-import { registrarErroNoServidor, registrarPushToken } from './src/services/api';
-
+import {
+  registrarErroNoServidor,
+  registrarPushToken,
+  verificarNotificacoesDiarias,
+} from './src/services/api';
+import * as SecureStore from 'expo-secure-store';
+import { buscarTarefas, ApiError } from './src/services/api';
 
 
 const apiUrl = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3000';
@@ -20,6 +25,8 @@ const apiUrl = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3000';
 
 const backgroundImage = require('./assets/2.png');
 const logoImage = require('./assets/logoBranco - Copia.png');
+
+
 
 export default function App() {
   const [token, setToken] = useState<string | null>(null);
@@ -34,6 +41,39 @@ export default function App() {
 
   useEffect(() => {
     return configurarToqueNaNotificacao(setTarefaNotificadaId);
+  }, []);
+
+  /* Restaura o token de autenticação do usuário ao iniciar o aplicativo */
+  useEffect(() => {
+    async function restaurarLogin() {
+      const tokenSalvo = await SecureStore.getItemAsync('dexter_auth_token');
+      if (!tokenSalvo) {
+        return;
+      }
+      try {
+        await buscarTarefas(tokenSalvo);
+        setToken(tokenSalvo);
+        setIsLoggedIn(true);
+
+        const expoPushToken = await obterExpoPushToken();
+        await registrarPushToken(tokenSalvo, expoPushToken);
+        await verificarNotificacoesDiarias(tokenSalvo);
+      } catch (error) {
+        if (
+        error instanceof ApiError &&
+        (error.status === 401 || error.status === 403)
+      ) {
+        await SecureStore.deleteItemAsync('dexter_auth_token');
+        setToken(null);
+        setIsLoggedIn(false);
+      } else {
+        console.error('Não foi possível validar a sessão:', error);
+      }
+    }
+  }
+
+
+    restaurarLogin();
   }, []);
 
   useEffect(() => {
@@ -104,6 +144,7 @@ return (
       try {
         const expoPushToken = await obterExpoPushToken();
         await registrarPushToken(novoToken, expoPushToken);
+        await verificarNotificacoesDiarias(novoToken);
       } catch (error) {
         console.error('Erro ao registrar notificações push:', error);
 
@@ -130,7 +171,10 @@ return (
       <MenuScreen
         token={token}
         tarefaNotificadaId={tarefaNotificadaId}
-        onLogout={() => {
+        onLogout={async () => {
+          await SecureStore.deleteItemAsync('dexter_auth_token');
+
+
           setToken(null);
           setIsLoggedIn(false);
           setTarefaNotificadaId(null);

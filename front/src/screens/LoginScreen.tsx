@@ -29,8 +29,10 @@ export function LoginScreen({ onLogin, onRegister, onRecoverPassword }: LoginScr
       })
     );
     animacaoOrbita.start();
-
-    async function loadSavedLogin() {
+  }, []);
+  
+      /*removido motivo de segurança, não é seguro salvar senha em texto puro no dispositivo do usuário*/
+    /*async function loadSavedLogin() {
       const savedEmail = await SecureStore.getItemAsync('dexter_login_email');
       const savedPassword = await SecureStore.getItemAsync('dexter_login_password');
 
@@ -43,7 +45,7 @@ export function LoginScreen({ onLogin, onRegister, onRecoverPassword }: LoginScr
 
     loadSavedLogin();
     return () => animacaoOrbita.stop();
-  }, [rotacao]);
+  }, [rotacao]); */
 
   const handleLogin = async () => {
     if (!email.trim() || !password.trim()) {
@@ -56,15 +58,16 @@ export function LoginScreen({ onLogin, onRegister, onRecoverPassword }: LoginScr
 
     try {
       const resposta = await fazerLogin(email.trim(), password);
-
+       /* troca a chave de autenticação do usuário no SecureStore, caso o usuário tenha optado por lembrar o login, questão de segurança */
       if (rememberLogin) {
-        await SecureStore.setItemAsync('dexter_login_email', email.trim());
-        await SecureStore.setItemAsync('dexter_login_password', password);
+        await SecureStore.setItemAsync(
+          'dexter_auth_token',
+          resposta.token
+        );
       } else {
-        await SecureStore.deleteItemAsync('dexter_login_email');
-        await SecureStore.deleteItemAsync('dexter_login_password');
+        await SecureStore.deleteItemAsync('dexter_auth_token');
       }
-
+      /*----------------------------------------*/
       onLogin(resposta.token);
     } catch (error) {
       const mensagem =
@@ -161,7 +164,7 @@ export function LoginScreen({ onLogin, onRegister, onRecoverPassword }: LoginScr
             <View style={[loginStyles.checkbox, rememberLogin && loginStyles.checkboxSelected]}>
               {rememberLogin && <Text style={loginStyles.checkboxMark}>✓</Text>}
             </View>
-            <Text style={loginStyles.rememberText}>Lembrar meus dados</Text>
+            <Text style={loginStyles.rememberText}>Manter logado</Text>
           </Pressable>
           <Pressable onPress={onRecoverPassword} style={loginStyles.forgotButton}>
             <Text style={loginStyles.forgotText}>Esqueci minha senha</Text>

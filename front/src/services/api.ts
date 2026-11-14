@@ -7,6 +7,15 @@ type ApiOptions = RequestInit & {
   token?: string;
 };
 
+export class ApiError extends Error {
+  status: number;
+
+  constructor(message: string, status: number) {
+    super(message);
+    this.status = status;
+  }
+}
+
 export async function apiRequest(path: string, options: ApiOptions = {}) {
   const { token, headers, ...requestOptions } = options;
   const controller = new AbortController();
@@ -32,9 +41,10 @@ export async function apiRequest(path: string, options: ApiOptions = {}) {
         `A API retornou uma resposta inválida (HTTP ${response.status}). Verifique EXPO_PUBLIC_API_URL.`,
       );
     }
-
+    /* Se a resposta não for bem-sucedida, lança um erro com a mensagem do servidor ou uma mensagem genérica */
     if (!response.ok) {
-      throw new Error(data.erro || "Erro na comunica��o com o servidor");
+      throw new ApiError(  data.erro || "Erro na comunicação com o servidor",
+  response.status);
     }
     return data;
   } catch (error) {
@@ -270,6 +280,13 @@ export async function registrarPushToken(
       token: expoPushToken,
       plataforma: 'expo',
     }),
+  });
+}
+
+export async function verificarNotificacoesDiarias(token: string) {
+  return apiRequest('/notificacoes/verificar-diarias', {
+    method: 'POST',
+    token,
   });
 }
 

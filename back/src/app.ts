@@ -11,7 +11,7 @@ import routesAutorizacao from './routes/auth/login'
 import routesAgentChat from './routes/agent/chat'
 import routesPushTokens from './routes/pushTokens'
 import routesLogs from './routes/logs'
-import { enviarPushParaUsuario } from './services/pushNotifications'
+import { verificarNotificacoesDiarias } from './services/dailyNotifications'
 import { logger, registrarErro } from './services/logger'
 import { TokenInterface } from './routes/verificaToken'
 
@@ -92,65 +92,19 @@ cron.schedule('0 0 * * *', async () => {
   }
 })
 
-// Alterado: agenda o envio das notificacoes ao meio-dia no fuso de Sao Paulo.
-cron.schedule('0 12 * * *', async () => {
-  console.log("Iniciando verificação de prazos para notificações...")
-  const agora = new Date()
-
-  const limiteDosProximos15Dias = new Date(agora)
-  limiteDosProximos15Dias.setDate(limiteDosProximos15Dias.getDate() + 7)
-
-  try {
-    const tarefasVencendo = await prisma.tarefa.findMany({
-      where: {
-        deletadoEm: null,
-        arquivadoEm: null,
-        status: { not: "CONCLUIDA" },
-        prazoFim: {
-          not: null,
-          lte: limiteDosProximos15Dias,
-        },
-        // Alterado: considera qualquer notificacao existente para evitar duplicatas.
-        notificacoes: { none: {} }
-      }
+cron.schedule('0 8 * * *', () => {
+  void verificarNotificacoesDiarias()
+    .then((totalEnviado) => {
+      console.log(`${totalEnviado} notificação(ões) diária(s) enviada(s).`)
     })
-
-    if (tarefasVencendo.length === 0) {
-      console.log("Nenhuma tarefa pendente dentro da janela de notificação.")
-      return
-    }
-
-    const notificacoesCriadas = await prisma.$transaction(
-      tarefasVencendo.map((tarefa) =>
-        prisma.notificacao.create({
-          data: {
-            usuarioId: tarefa.usuarioId,
-            tarefaId: tarefa.id,
-            vencimento: tarefa.prazoFim!
-          }
-        })
-      )
-    )
-    for (const tarefa of tarefasVencendo) {
-      await enviarPushParaUsuario(
-        tarefa.usuarioId,
-        'Tarefa próxima do prazo',
-        `A tarefa "${tarefa.titulo}" está próxima do prazo.`,
-        {
-          tarefaId: tarefa.id,
-        },
-      );
-    }
-
-    console.log(`${notificacoesCriadas.length} alertas gerados para tarefas próximas do prazo.`)
-  } catch (error) {
-    await registrarErro({
-      erro: error instanceof Error ? error.message : String(error),
-      onde: "geração automática de notificações",
-      sessao: "cron-notificacoes",
-      stack: error instanceof Error ? error.stack : undefined,
+    .catch(async (error) => {
+      await registrarErro({
+        erro: error instanceof Error ? error.message : String(error),
+        onde: "geração automática de notificações diárias",
+        sessao: "cron-notificacoes-diarias",
+        stack: error instanceof Error ? error.stack : undefined,
+      })
     })
-  }
 }, {
   timezone: 'America/Sao_Paulo',
 })
@@ -201,4 +155,17 @@ app.use(async (error: unknown, req: express.Request, res: express.Response, _nex
 
 app.listen(port, () => {
   console.log(`Servidor rodando na porta: ${port}`)
+
+  void verificarNotificacoesDiarias()
+    .then((totalEnviado) => {
+      console.log(`${totalEnviado} notificação(ões) diária(s) enviada(s) na inicialização.`)
+    })
+    .catch(async (error) => {
+      await registrarErro({
+        erro: error instanceof Error ? error.message : String(error),
+        onde: "verificação de notificações na inicialização",
+        sessao: "inicio-servidor",
+        stack: error instanceof Error ? error.stack : undefined,
+      })
+    })
 })

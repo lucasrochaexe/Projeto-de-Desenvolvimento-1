@@ -8,7 +8,7 @@ export async function enviarPushParaUsuario(
   titulo: string,
   mensagem: string,
   data: Record<string, unknown> = {},
-) {
+): Promise<boolean> {
   const registros = await prisma.pushToken.findMany({
     where: {
       usuarioId,
@@ -28,7 +28,7 @@ export async function enviarPushParaUsuario(
     }));
 
   if (mensagens.length === 0) {
-    return;
+    return false;
   }
 
   const blocos = expo.chunkPushNotifications(mensagens);
@@ -36,4 +36,6 @@ export async function enviarPushParaUsuario(
   for (const bloco of blocos) {
     await expo.sendPushNotificationsAsync(bloco);
   }
+
+  return true;
 }

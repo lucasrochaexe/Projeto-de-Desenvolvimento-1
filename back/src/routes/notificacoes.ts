@@ -1,10 +1,26 @@
 import { Router, Response } from 'express'
 import { prisma } from '../../lib/prisma'
 import { verificaToken, TokenInterface } from './verificaToken'
+import { verificarNotificacoesDiarias } from '../services/dailyNotifications'
 
 const router = Router()
 
 router.use(verificaToken)
+
+router.post("/verificar-diarias", async (req: TokenInterface, res: Response) => {
+    if (!req.usuarioId) {
+        res.status(401).json({ erro: "Usuário não autenticado." })
+        return
+    }
+
+    try {
+        const totalEnviado = await verificarNotificacoesDiarias(req.usuarioId)
+        res.status(200).json({ totalEnviado })
+    } catch (error) {
+        console.error("Erro ao verificar notificações diárias:", error)
+        res.status(500).json({ erro: "Erro ao verificar notificações diárias." })
+    }
+})
 
 router.get("/", async (req: TokenInterface, res: Response) => {
     try {
