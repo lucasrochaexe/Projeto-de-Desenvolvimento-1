@@ -92,8 +92,8 @@ cron.schedule('0 0 * * *', async () => {
   }
 })
 
-// Notificações para tarefas que vencem nos próximos 15 dias ou já estão atrasadas. ajustar projeto final 0 0 * * *
-cron.schedule('0 0 * * *', async () => {
+// Alterado: agenda o envio das notificacoes ao meio-dia no fuso de Sao Paulo.
+cron.schedule('0 12 * * *', async () => {
   console.log("Iniciando verificação de prazos para notificações...")
   const agora = new Date()
 
@@ -110,11 +110,8 @@ cron.schedule('0 0 * * *', async () => {
           not: null,
           lte: limiteDosProximos15Dias,
         },
-        notificacoes: {
-          none: {
-            visualizada: false,
-          }
-        }
+        // Alterado: considera qualquer notificacao existente para evitar duplicatas.
+        notificacoes: { none: {} }
       }
     })
 
@@ -154,6 +151,8 @@ cron.schedule('0 0 * * *', async () => {
       stack: error instanceof Error ? error.stack : undefined,
     })
   }
+}, {
+  timezone: 'America/Sao_Paulo',
 })
 
 // Marca como atrasadas as tarefas pendentes cujo prazo já terminou.
