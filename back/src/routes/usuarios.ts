@@ -2,21 +2,11 @@ import { prisma } from "../../lib/prisma"
 import { Router } from 'express'
 import { z } from 'zod'
 import { verificaToken, verificaAdmin } from "./verificaToken"
+import { enviarEmail } from "../services/email"
 import bcrypt from 'bcrypt'
-import nodemailer from 'nodemailer'
 import crypto from 'crypto'
 
 const router = Router()
-
-const transporter = nodemailer.createTransport({
-    host: "sandbox.smtp.mailtrap.io",
-    port: 587,
-    secure: false,
-    auth: {
-        user: process.env.MAILTRAP_EMAIL,
-        pass: process.env.MAILTRAP_SENHA
-    },
-})
 
 const usuarioSchema = z.object({
     nome: z.string().min(3,
@@ -126,8 +116,7 @@ router.post("/", async (req, res) => {
         const apiPublica = process.env.API_PUBLIC_URL || "http://localhost:3000"
         const linkAtivacao = `${apiPublica}/usuarios/ativar?token=${tokenAtivacao}`
 
-        transporter.sendMail({
-            from: '"Dexter App" <support@dexterapp.com>',
+        await enviarEmail({
             to: email,
                         subject: "Bem-vindo ao Dexter | Simplificando sua rotina",
                         text: `Bem-vindo ao Dexter!\n\nSimplificando sua rotina, um dia de cada vez.\n\nAtive sua conta pelo link:\n${linkAtivacao}\n\nEste link expira em 24 horas.`,
@@ -362,8 +351,7 @@ router.post("/esqueceu-senha", async (req, res) => {
             }
         })
 
-        transporter.sendMail({
-            from: '"Dexter App" <support@dexterapp.com>',
+        await enviarEmail({
             to: email,
             subject: "Código de Recuperação de Senha",
             text: `Seu código de recuperação é: ${codigo}`,
@@ -474,8 +462,7 @@ router.post("/reenviar-ativacao", async (req, res) => {
         const apiPublica = process.env.API_PUBLIC_URL || "http://localhost:3000"
         const linkAtivacao = `${apiPublica}/usuarios/ativar?token=${tokenAtivacao}`
 
-        transporter.sendMail({
-            from: '"Dexter App" <support@dexterapp.com>',
+        await enviarEmail({
             to: email,
             subject: "Ative sua conta no Dexter App",
             text: `Bem-vindo! Clique no link para ativar sua conta: ${linkAtivacao}`,
