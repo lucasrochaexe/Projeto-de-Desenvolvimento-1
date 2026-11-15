@@ -97,6 +97,7 @@ Projeto-de-Desenvolvimento-1/
 │   ├── atas/
 │   ├── casos_de_uso.md
 │   ├── diagrama_casos_uso.png
+|   ├── requisitos_e_backlog.md
 │   └── stack_tecnologico_e_arquitetura.md
 └── README.md                   # Documentação principal do projeto
 ```
